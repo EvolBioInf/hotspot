@@ -1,0 +1,11 @@
+# NB: These mouse hotspot data by Smagulova et al. (2011) are provided 
+#   as part of the aspro software package for designing
+#   Allele-Specific PRimers and Oligos. The hotspot coordinates by
+#   Smagulova et al. refer to mm9 and will therefore not match the
+#   current mouse assembly.
+# Rerefence: Smagulova et al. (2011). Genome-wide
+#   analysis reveals novel molecular features of mouse recombination
+#   hotspots. Nature, 472:375-378.
+# int   chr	start	end
+int1	chr19	3796569	3799969
+int2	chr19	3804782	3808182

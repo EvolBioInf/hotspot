@@ -1,0 +1,227 @@
+\documentclass{article}
+\usepackage{graphics,eurosym,latexsym}
+\usepackage{listings}
+\lstset{columns=fixed,basicstyle=\ttfamily,numbers=left,numberstyle=\tiny,stepnumber=5,breaklines=true}
+\usepackage{times}
+% \usepackage[round]{natbib}
+% \bibliographystyle{plainnat}
+\bibliographystyle{plain}
+\oddsidemargin=0cm
+\evensidemargin=0cm
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ee}{\end{enumerate}}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\I}{\item}
+\newcommand{\ty}{\texttt}
+\newcommand{\kr}{K_{\rm r}}
+\newcommand{\version}{0.4}
+\textwidth=16cm
+\textheight=23cm
+\begin{document}
+\title{\ty{sports}, v. \version: SPOt Recombination hotspoTS}
+\author{Bernhard Haubold\\\small Max-Planck-Institute for Evolutionary Biology, Pl\"on, Germany}
+\maketitle
+\section{Introduction}
+\ty{sports} is a software package for detecting and analyzing
+recombination hotspots. This is carried out in three steps:
+Preparation of allele-specific PCR, the actual PCR, and analysis of
+the PCR products. \ty{sports} contains the two programs \ty{asp} and \ty{aso} for designing
+allele-specific primers and oligos used in the pre-PCR phase. In
+addition, it contains \ty{rr} for computing the rate of recombination
+during the post-PCR phase of a project. In addition, the package
+contains example input data and a script for downloading the mouse
+genome sequence and the corresponding SNP data.
+
+\section{Dependencies}
+\bi
+\I \ty{libdivsufsort}: \ty{https://code.google.com/p/libdivsufsort/}
+\I \ty{tabix}: part of SAMtools~\cite{li09:seq},
+\ty{http://www.htslib.org/}
+\I \ty{gsl}: Gnu Scientific Library, \ty{http://www.gnu.org/software/gsl/}
+\ei
+
+\subsection{\ty{aso}}
+\ty{aso} is a program for designing allele-specific oligonucleotides that are
+complementary to SNPs contained in recombination hotspots. The program
+can also find oligos that do not intersect any SNPs or indels. 
+
+\subsection{\ty{asp}}
+\ty{asp} is a program for designing PCR primers that have a 3'-end
+complementary to SNPs in the regions flanking a recombination
+hotspot. The user can set a maximal and a minimal primer
+length. Within these bounds the program searches for the primer length
+that comes closest to an optimal GC-content, which the user can also
+set.
+
+\subsection{\ty{rr}}
+\ty{rr} implements a maximum likelihood procedure for estimating the
+number of crossover events from the observed number of positive and
+negative allele-specific PCR reactions. In addition, it uses the
+likelihood ratio method for estimating a confidence interval. By
+default this interval is set to 95\%, but the user can set it to any
+level desired.
+
+\section{Getting Started}
+\ty{aso} and \ty{asp} are written in C on a computer running Linux and
+they should
+work on any standard UNIX system. However, please contact me at
+\ty{haubold@evolbio.mpg.de} if you have any problems with the
+programs. The following sections give a tutorial introduction to using
+the \ty{aso} and \ty{asp}.
+
+\subsection{\ty{aso}}
+\bi
+\I List options
+\begin{verbatim}
+ls aso -h
+\end{verbatim}
+\I Hotspot locations are supplied in a tab-delimited file containing
+three columns: chromosome, start, and end. Take a look at two the
+example hotspot coordinates supplied with the program
+\begin{verbatim}
+cat data/mus/exampleHotSpots19.txt 
+# NB: These mouse hotspot data by Smagulova et al. (2011) are provided 
+#   as part of the aspro software package for designing
+#   Allele-Specific PRimers and Oligos. The hotspot coordinates by
+#   Smagulova et al. refer to mm9 and will therefore not match the
+#   current mouse assembly.
+# Rerefence: Smagulova et al. (2011). Genome-wide
+#   analysis reveals novel molecular features of mouse recombination
+#   hotspots. Nature, 472:375-378.
+# int   chr	start	end
+int1	chr19	3796569	3799969
+int2	chr19	3804782	3808182
+\end{verbatim}
+Rows starting with a hash are comments and there can be as many
+comments as you like. This is followed by the hotspot data in four
+columns: Hotspot name, chromosome, start, and end.
+\I The two example hotspots come from chromosome 19. To load the
+genome and SNP data for chromosome 19, execute 
+\begin{verbatim}
+make get-chr19-data-mus 
+\end{verbatim}
+\I Check that the genome data was downloaded:
+\begin{verbatim}
+ls data/mus/genome/
+\end{verbatim}
+\I Check that the SNP data was downloaded:
+\begin{verbatim}
+ls data/mus/vcf/
+\end{verbatim}
+\I Now run \ty{aso}
+\begin{verbatim}
+aso -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt |
+head
+int1	rs37745172	19	3796745	GGCATAAGCCTGTGGTT	GGCATAAGTCTGTGGTT
+int1	rs214526021	19	3797057	GTGAGTTCGAGGCCAGC	GTGAGTTCAAGGCCAGC
+int1	rs232006218	19	3797126	AGCTTTTCCTCTTTTCT	AGCTTTTCTTCTTTTCT
+int1	rs254266733	19	3797132	TCCTCTTTTCTGCCTTT	TCCTCTTTCCTGCCTTT
+int1	rs212133110	19	3797168	CAGCCTCCTTGTTACTC	CAGCCTCCCTGTTACTC
+int1	rs243001379	19	3797209	TAGTAGCAGTTCGGCTC	TAGTAGCAATTCGGCTC
+int1	rs37665146	19	3797213	AGCAGTTCGGCTCATAC	AGCAGTTCAGCTCATAC
+int1	rs221355178	19	3797237	CATTGTTGCTGTTGCCA	CATTGTTGTTGTTGCCA
+int1	rs232704341	19	3797253	ACAGTGGTTTCTTGTGT	ACAGTGGTCTCTTGTGT
+int1	rs250384293	19	3797258	GGTTTCTTGTGTTTGGA	GGTTTCTTATGTTTGGA
+\end{verbatim}
+The output consists of four columns:
+\be
+\I Interval name
+\I SNP name
+\I Chromosome
+\I SNP position
+\I First oligo
+\I Second oligo
+\ee
+The two oligos only differ in the middle, the SNP position.
+\I Instead of printing allele-specific oligos, \ty{aso} can also find
+oligos that do not span any polymorphism. These are usually longer,
+say 100 bp (\ty{-l}) and are found in the non-SNP mode (\ty{-n}):
+\begin{verbatim}
+aso -n -l 100 -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | head
+int1	rs37745172	19	3796745	0.893	CCT...
+int1	rs251742220	19	3796933	1.000	GCA...
+int1	rs214526021	19	3797057	0.825	GAG...
+int1	rs212133110	19	3797168	0.928	TTG...
+int1	rs219156104	19	3797314	0.928	GGC...
+int1	rs225529556	19	3797430	0.825	CAA...
+int1	rs37178516	19	3797568	0.962	TAG...
+int1	rs250108111	19	3797711	0.962	GTT...
+int1	rs219305977	19	3797816	0.962	TGG...
+int1	rs255329313	19	3797981	0.928	CTA...
+\end{verbatim}
+The columns indicate
+\begin{enumerate}
+\item Interval name
+\item Name of SNP upsream of which the oligo is located
+\item Start position of oligo
+\item Complexity of oligo. This measure lies between zero and 1 with
+  zero being least complex; a sequence consisting of a single
+  nucleotide would have zero complexity; random sequences with
+  equi-probable nucleotides have a complexity close to 1. We can sort
+  the output according to complexity:
+\begin{verbatim}
+aso -n -l 100 -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | 
+sort -n -k 5 | head
+int1	rs587144268	19	3798964	0.447	ACG...
+int2	rs214880222	19	3807503	0.515	CCC...
+int1	rs262734534	19	3799720	0.687	TTT...
+int1	rs214526021	19	3797057	0.825	GAG...
+int1	rs225529556	19	3797430	0.825	CAA...
+int1	rs246740259	19	3799189	0.825	ATA...
+int2	rs252557020	19	3807609	0.825	TTT...
+int2	rs223077599	19	3806147	0.859	TCT...
+int2	rs234318596	19	3806539	0.859	ACT...
+int2	rs255109107	19	3806426	0.859	TAC...
+\end{verbatim}
+Notice the long microsatellelite in the top sequence. 
+\item Sequence
+\end{enumerate}
+\I Run \ty{asp} to find forward primers in a window of 5kb downstream
+of the start of the interval of interest:
+\begin{verbatim}
+asp -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | head
+int1	rs36588234	19	3791591	GATTCAGCCAACAA	0.29	GATTCAGCCAACAG	0.33
+int1	rs266164282	19	3791605	TTTAGATAGTTGGT	0.19	TTTAGATAGTTGGG	0.24
+int1	rs233070165	19	3791753	AGAAGAGCAGTCGG	0.38	AGAAGAGCAGTCGA	0.33
+int1	rs586881213	19	3791766	GGTGCTCTTACCCA	0.38	GGTGCTCTTACCCT	0.38
+int1	rs258256279	19	3791984	AGTTCCAGGACAGT	0.33	AGTTCCAGGACAGC	0.38
+int1	rs215047461	19	3792005	GCACATAAAAACTT	0.19	GCACATAAAAACTC	0.24
+int1	rs38604711	19	3792235	TATTTTGATTGCAGAAATT	0.15	TGATTGCAGAAATC	0.24
+int1	rs212603417	19	3792310	TTAAACCTCCCATT	0.24	TTAAACCTCCCATC	0.29
+int1	rs36316803	19	3792353	TATTGTCATGAGCA	0.24	TATTGTCATGAGCG	0.29
+int1	rs579758610	19	3792405	CATTACCCATGAGC	0.33	CATTACCCATGAGG	0.33
+\end{verbatim}
+The output columns are
+\begin{enumerate}
+\I Interval name
+\I SNP name
+\I Chromosome
+\I SNP position
+\I Primer for first allele
+\I GC-content for first primer
+\I Primer for second allele
+\I CG-content for second primer
+\end{enumerate}
+Notice that the two primers need not be of the same length. By
+default, \ty{asp} searches for a primer of length 14--19 with a
+GC-content as close to 0.5 as possible.
+\I To get the reverse primers in the upstream region, run
+\begin{verbatim}
+asp -r -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | head
+int1	rs249017060	19	3800119	AGAGTGAGTTCCAG	0.50	AGAGTGAGTTCCAA	0.43
+int1	rs218978784	19	3800120	CAGAGTGAGTTCCA	0.50	CAGAGTGAGTTCCC	0.57
+int1	rs235336981	19	3800166	GCATCCTTTAATCA	0.36	GCATCCTTTAATCC	0.43
+int1	rs584116440	19	3800176	CAGTGGTGATGCAT	0.50	CAGTGGTGATGCAC	0.57
+int1	rs253442444	19	3800434	CTCTCAAGTGCTGG	0.57	CTCTCAAGTGCTGA	0.50
+int1	rs214858261	19	3800484	TGCTCTATGAACCA	0.43	TGCTCTATGAACCT	0.43
+int1	rs232338632	19	3800485	TTGCTCTATGAACC	0.43	TTGCTCTATGAACT	0.36
+int1	rs261835571	19	3800506	TGGCTGTGGCTGTC	0.64	TGGCTGTGGCTGTT	0.57
+int1	rs222895727	19	3800511	TTATGTGGCTGTGG	0.50	TTATGTGGCTGTGT	0.43
+int1	rs579285301	19	3800535	TATTTATTTATTTTTGAGG	0.16	ATTTATTTATTTTTGAGA	0.11
+\end{verbatim}
+\ei
+
+%%\bibliography{/home/haubold/References/references}
+\end{document}
+
