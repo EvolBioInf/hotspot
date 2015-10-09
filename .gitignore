@@ -1,0 +1,22 @@
+# Build files
+*.o
+common/libcommon.a
+src_aso/aso
+src_asp/asp
+src_xov/xov
+
+# Autotools
+config.*
+Makefile
+Makefile.in
+.deps
+aclocal.m4
+ar-lib
+autom4te.cache
+autoscan.log
+compile
+configure
+configure.scan
+depcomp
+install-sh
+missing
