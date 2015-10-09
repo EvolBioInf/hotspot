@@ -22,6 +22,10 @@ AS_IF([test "x$have_libdivsufsort" = "xno"],
 	[AC_MSG_ERROR([Configuration for libdivsufsort failed. Please install libdivsufsort.])
 ])
 
+AC_CHECK_LIB([gslcblas],[cblas_dgemm])
+AC_CHECK_LIB([gsl],[gsl_blas_dgemm])
+
+
 # Check for various headers including those used by libdivsufsort.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h unistd.h stdint.h inttypes.h err.h errno.h fcntl.h])
 AC_CHECK_HEADERS([float.h])
