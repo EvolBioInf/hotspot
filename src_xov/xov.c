@@ -94,7 +94,7 @@ int main(int argc, char *argv[]){
   Args *args;
   FILE *fp;
 
-  version = "0.1";
+  version = "0.2";
   setprogname2("xov");
   args = getArgs(argc, argv);
   if(args->v)

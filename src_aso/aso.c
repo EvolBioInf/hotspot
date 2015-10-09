@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   FILE *fp;
 
   cmd = (char *)emalloc(256 * sizeof(char));
-  version = "0.4";
+  version = "0.2";
   setprogname2("aso");
   args = getArgs(argc, argv);
   if (args->v)
