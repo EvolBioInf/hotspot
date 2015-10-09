@@ -4,7 +4,6 @@ AM_INIT_AUTOMAKE([-Wall foreign ])
 #AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CC
-AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_CPP
 AC_PROG_RANLIB
@@ -41,26 +40,22 @@ AM_CONDITIONAL([BUILD_WITH_LIBDIVSUFSORT],[test "x${with_libdivsufsort}" != "xno
 
 # Check for various headers including those used by libdivsufsort.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h unistd.h stdint.h inttypes.h err.h errno.h fcntl.h])
+AC_CHECK_HEADERS([float.h])
 
-AC_C_INLINE
+
+# AC_C_INLINE
 AC_TYPE_SIZE_T
-AC_TYPE_SSIZE_T
-AC_TYPE_INT32_T
-AC_TYPE_UINT8_T
-AC_HEADER_STDBOOL
+# AC_TYPE_SSIZE_T
+# AC_TYPE_INT32_T
+# AC_TYPE_UINT8_T
+# AC_HEADER_STDBOOL
 
-# Until someone convinces me otherwise, I will deactivate the macros
-# AC_FUNC_MALLOC and AC_FUNC_REALLOC. They only check if `malloc(0)` retuns a
-# non-null pointer. This breaks the build on systems using uClibc, including
-# my laptop.
-# As requesting zero bytes is not useful, and implementation-defined behaviour,
-# it should be avoided in the first place. Thus I really don't need these checks.
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
 
-AC_CHECK_FUNCS([floor pow sqrt strdup strerror])
-AC_CHECK_FUNCS([strndup])
-AC_CHECK_FUNCS([strchr strrchr strchrnul])
-AC_CHECK_FUNCS([strtoul strtod])
-AC_CHECK_FUNCS([reallocarray])
+
+AC_CHECK_FUNCS([pow])
+AC_CHECK_FUNCS([strchr strcspn strerror strstr])
 
 AC_CONFIG_FILES([
  Makefile
