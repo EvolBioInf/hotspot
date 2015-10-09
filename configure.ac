@@ -14,29 +14,13 @@ AC_LANG(C)
 
 AC_CHECK_LIB(m, cos)
 
-# By default try to build with libdivsufsort.
-AC_ARG_WITH([libdivsufsort],
-    AS_HELP_STRING([--without-libdivsufsort], [Build without libdivsufsort and use psufsort instead.]))
-
-AS_IF([test "x$with_libdivsufsort" != "xno"],
-	[
-		AC_CHECK_HEADERS([divsufsort.h],[have_libdivsufsort=yes],[have_libdivsufsort=no])
-		AC_CHECK_LIB(divsufsort, divsufsort, [], [have_libdivsufsort=no])
-	],
-	[
-		have_libdivsufsort=no
-	]
-)
+# Check for libdivsufsort
+AC_CHECK_HEADERS([divsufsort.h],[have_libdivsufsort=yes],[have_libdivsufsort=no])
+AC_CHECK_LIB(divsufsort, divsufsort, [], [have_libdivsufsort=no])
 
 AS_IF([test "x$have_libdivsufsort" = "xno"],
-	[AS_IF([test "x$with_libdivsufsort" != "xno"],
-		[AC_MSG_ERROR([Configuration for libdivsufsort failed. Either install libdivsufsort, or use our replacement, psufsort, instead.
-	./configure --without-libdivsufsort
-The latter may result in longer runtimes.])
-	])
+	[AC_MSG_ERROR([Configuration for libdivsufsort failed. Please install libdivsufsort.])
 ])
-
-AM_CONDITIONAL([BUILD_WITH_LIBDIVSUFSORT],[test "x${with_libdivsufsort}" != "xno"])
 
 # Check for various headers including those used by libdivsufsort.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h unistd.h stdint.h inttypes.h err.h errno.h fcntl.h])
