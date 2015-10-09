@@ -45,6 +45,8 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([pow])
 AC_CHECK_FUNCS([strchr strcspn strerror strstr])
 
+AC_CONFIG_HEADERS([common/config.h:common/config.hin])
+
 AC_CONFIG_FILES([
  Makefile
  common/Makefile
