@@ -15,6 +15,7 @@ typedef struct args {
   char *s; /* snp data in vcf format */
   char r;  /* non-SNP oligos */
   char u;  /* universals? */
+  char b;  /* debugging info? */
   char v;  /* version message? */
   char e;  /* error message? */
   char **inputFiles;

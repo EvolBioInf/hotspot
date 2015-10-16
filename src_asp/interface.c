@@ -14,7 +14,7 @@ Args *args;
 
 Args *getArgs(int argc, char *argv[]) {
   char c;
-  char *optString = "hvum:M:o:rg:s:f:d:D:";
+  char *optString = "hvubm:M:o:rg:s:f:d:D:";
 
   args = (Args *)emalloc(sizeof(Args));
   args->f = DEFAULT_F;
@@ -27,6 +27,7 @@ Args *getArgs(int argc, char *argv[]) {
   args->u = 0;
   args->o = DEFAULT_O;
   args->r = 0;
+  args->b = 0;
   args->h = 0;
   args->v = 0;
   args->e = 0;
@@ -47,6 +48,9 @@ Args *getArgs(int argc, char *argv[]) {
       break;
     case 'm': /* minimum length */
       args->m = atoi(optarg);
+      break;
+    case 'b': /* print debugging information? */
+      args->b = 1;
       break;
     case 'M': /* maximum length */
       args->M = atoi(optarg);
@@ -117,6 +121,7 @@ void printUsage() {
   printf("\t[-u universals; default: allele-specific primers]\n");
   printf("\t[-d NUM distance between forward universals; default: %d]\n",DEFAULT_DF);
   printf("\t[-D NUM distance between reverse universals; default: %d]\n",DEFAULT_DR);
+  printf("\t[-b print debugging information]\n");
   printf("\t[-h print this help message and exit]\n");
   printf("\t[-v print program information and exit]\n");
   exit(0);

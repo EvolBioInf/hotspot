@@ -21,25 +21,25 @@ void scanFile(Args *args, FILE *fp){
   char *line, *name, *token;
   size_t n;
   int status, len;
-  int pos[2], p, i, l, tp;
+  int pos[2], p, i, l, tp, tn;
   Data *data;
   double ll, ul, cf;
 
   line = NULL;
-  name = (char *)emalloc(256);
   while((status = getline(&line,&n,fp)) != -1){
     if(line[0] != '#')
       break;
   }
   if(!args->p)
     printf("# SNP\tbp\t[cM\tcM\tcM]\n");
-  data = newData(1);
+  data = newData(1,args->o);
   while(status != -1){
     data->n = 0;
-    name = strtok(line,"\t");     /* read name of region */
+    name = estrdup(strtok(line,"\t"));     /* read name of region */
     token = strtok(NULL,"\t");    
     len = atoi(token);            /* length of region in bp */
-    tp = 0;
+    tp = 0; /* total positives */
+    tn = 0; /* total negatives */
     while((token = strtok(NULL,"\t")) != NULL){ /* iterating across experiments */
       if(data->n + 1 == data->maxN)
 	expandData(data);
@@ -59,33 +59,35 @@ void scanFile(Args *args, FILE *fp){
       data->numNeg[data->n] = atoi(token);
       token -= pos[1];
       tp += data->numPos[data->n];
+      tn += data->numNeg[data->n];
       data->n++;
+    }
+    if(args->d){
+      printData(name,len,data);
+      exit(0);
     }
     if(args->p && tp){
       printLikFun(data, args);
       return;
     }
-    if(tp)
-      cf = crossoverFreq(data);
-    else
-      cf = 0.0;
+    cf = crossoverFreq(data);
     data->mlXover = cf;
     data->ci = args->c;
-    if(cf){
-      ul = upperCL(data,cf);
-      ll = lowerCL(data,cf);
-    }else{
-      ul = 0.;
-      ll = 0.;
-    }
+    ul = upperCL(data,cf);
+    ll = lowerCL(data,cf);
     /* convert to centi-Morgans */
     ll *= 100;
     cf *= 100;
     ul *= 100;
-    printf("%s\t%*d\t%.3f\t%.3f\t%.3f\n",name,4,len,ll,cf,ul);
+    if(cf < 100)
+      printf("%s\t%*d\t%.3f\t%.3f\t%.3f\n",name,4,len,ll,cf,ul);
+    else
+      printf("%s\t%*d\tNA\tNA\tNA\n",name,4,len);
     status = getline(&line,&n,fp);
+    free(name);
   } 
   free(line);
+  freeData(data);
 }
 
 int main(int argc, char *argv[]){

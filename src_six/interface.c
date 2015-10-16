@@ -14,16 +14,19 @@ Args *args;
 
 Args *getArgs(int argc, char *argv[]){
   char c;
-  char *optString = "hvpdoc:m:M:i:";
+  char *optString = "hvr:m:n:l:s:";
+  int i;
 
   args = (Args *)emalloc(sizeof(Args));
-  args->c = DEFAULT_C;
   args->m = DEFAULT_M;
-  args->M = DEFAULT_MM;
-  args->i = DEFAULT_I;
-  args->o = 0;
-  args->d = 0;
-  args->p = 0;
+  args->n = DEFAULT_N;
+  args->l = DEFAULT_L;
+  args->r = DEFAULT_R;
+  args->s = 0;
+  args->mol = (int *)emalloc(DEFAULT_M*sizeof(int));
+  args->mol[0] = DEFAULT_MM0;
+  args->mol[1] = DEFAULT_MM1;
+  args->mol[2] = DEFAULT_MM2;
   args->h = 0;
   args->v = 0;
   args->e = 0;
@@ -31,26 +34,23 @@ Args *getArgs(int argc, char *argv[]){
   c = getopt(argc, argv, optString);
   while(c != -1){
     switch(c){
-    case 'c':
-      args->c = atof(optarg);
+    case 'm':                           /* number of experiments */
+      args->m = atoi(optarg);
+      args->mol = (int *)erealloc(args->mol,sizeof(int)*args->m);
+      for(i=0;i<args->m;i++)
+	args->mol[i] = atoi(argv[optind+i]);
       break;
-    case 'm': /* minimum x-value for log-likelihood curve */
-      args->m = atof(optarg);
+    case 's':                           /* seed for random number generator */
+      args->s = atoi(optarg);
       break;
-    case 'M': /* maximum x-value for log-likelihood curve */
-      args->M = atof(optarg);
+    case 'n':                           /* replicates per experiment */
+      args->n = atoi(optarg);
       break;
-    case 'p': /* print log-likelihood curve? */
-      args->p = 1;
+    case 'r':                           /* replicate experiments */
+      args->r = atoi(optarg);
       break;
-    case 'o': /* use Poisson approximation */
-      args->o = 1;
-      break;
-    case 'd': /* print data? */
-      args->d = 1;
-      break;
-    case 'i': /* number of intervals for log-likelihood curve */
-      args->i = atoi(optarg);
+    case 'l':                           /* lambda */
+      args->l = atof(optarg);
       break;
     case '?':                           /* fall-through is intentional */
     case 'h':                           /* print help */
@@ -74,16 +74,14 @@ Args *getArgs(int argc, char *argv[]){
 
 void printUsage(){
   printf("Usage: %s [options] [inputFiles]\n",progname());
-  printf("Compute rate of crossover from experimental data\n");
-  printf("Example: xov foo.dat\n");
+  printf("<EXPLANATION>\n");
+  printf("<EXAMPLE>\n");
   printf("Options:\n");
-  printf("\t[-c <NUM> confidence interval; default: %.2f]\n",DEFAULT_C);
-  printf("\t[-p print log-likelihood curve; default: print ML-estimates]\n");
-  printf("\t[-m <NUM> minimum x-value for log-likelihood curve; default %.3f]\n",DEFAULT_M);
-  printf("\t[-M <NUM> maximum x-value for log-likelihood curve; default: %.3f]\n",DEFAULT_MM);
-  printf("\t[-i <NUM> number of intervals for log-likelihood curve; default: %d]\n",DEFAULT_I);
-  printf("\t[-o use Poisson approximation; default: use exact likelihood function]\n");
-  printf("\t[-d print data and exit (debug)]\n");
+  printf("\t[-r <NUM> number of replicates; default: %d\n",DEFAULT_R);
+  printf("\t[-m <NUM> number of experiments per replicate, followed by number of molecules per exp.; default: %d %d %d %d]\n", DEFAULT_M,DEFAULT_MM0,DEFAULT_MM1,DEFAULT_MM2);
+  printf("\t[-n <NUM> number of replicates per experiment; default: %d]\n",DEFAULT_N);
+  printf("\t[-l <NUM> lambda in cM; default: %.1f\n",DEFAULT_L);
+  printf("\t[-s <NUM> seed for random number generator; default: generated internally]\n");
   printf("\t[-h print this help message and exit]\n");
   printf("\t[-v print program information and exit]\n");
   exit(0);
