@@ -12,6 +12,8 @@ typedef struct args{
   char v;   /* version message? */
   char e;   /* error message? */
   char p;   /* print log-likelihood curve */
+  char d;   /* print data */
+  char o;   /* use Poisson approximation? */
   float m;  /* minimum x-value for log-likelihood curve */
   float M;  /* maximum x-value for log-likelihood curve */
   int i;    /* number of intervals for log-likelihood curve */
