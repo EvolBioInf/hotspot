@@ -13,27 +13,6 @@
 #include "ml.h"
 #include "eprintf.h"
 
-double logLik(double r, void *param){
-  double ll,x, k, pnr;
-  int i, n;
-  Data *data;
-
-  ll = 0;
-  data = (Data *)param;
-  for(i=0;i<data->n;i++){
-    x = data->numMol[i];
-    k = data->numNeg[i];
-    n = k + data->numPos[i];
-    pnr = pow(1.-r,x);
-    ll += gsl_sf_lnchoose(n,k) + k*x*log(1-r) + (n-k)*log(1-pnr);
-  }
-  if(ll == 0.)
-    ll = DBL_MAX;
-  else
-    ll *= -1;
-  return ll;
-}
-
 double logLikPoi(double lambda, void *param){
   double ll, x, k;
   int i, n;
@@ -45,11 +24,36 @@ double logLikPoi(double lambda, void *param){
     x = data->numMol[i];
     k = data->numNeg[i];
     n = k + data->numPos[i];
-    if(lambda > 0.)
+    if(lambda > 0.){
       ll += gsl_sf_lnchoose(n,k) - k*x*lambda+(n-k)*log(1-exp(-x*lambda));
+    }
   }
   if(ll == 0.)
     ll = DBL_MAX;
+  else
+    ll *= -1;
+  return ll;
+}
+
+double logLik(double r, void *param){
+  double ll,x, k, pnr;
+  int i, n;
+  Data *data;
+
+  if(r <= DBL_EPSILON || r >= 1.-DBL_EPSILON)
+    return DBL_MAX;
+
+  ll = 0;
+  data = (Data *)param;
+  for(i=0;i<data->n;i++){
+    x = data->numMol[i];
+    k = data->numNeg[i];
+    n = k + data->numPos[i];
+    pnr = pow(1.-r,x);
+    ll += gsl_sf_lnchoose(n,k) + k*x*log(1.-r) + (n-k)*log(1.-pnr);
+  }
+  if(ll == 0.)
+    ll = DBL_MAX/2.;
   else
     ll *= -1;
   return ll;
@@ -88,8 +92,8 @@ double crossoverFreq(Data *data){
   const gsl_min_fminimizer_type *T;
   gsl_min_fminimizer *s;
   double m = 0.5;
-  double a = 0.0+DBL_EPSILON, b = 0.9;
-  double la, lm, lb;
+  double a = 0.0, b = 1.0;
+  /* double la, lm, lb; */
   gsl_function F;
 
   if(data->o)
@@ -100,17 +104,17 @@ double crossoverFreq(Data *data){
 
   T = gsl_min_fminimizer_brent;
   s = gsl_min_fminimizer_alloc (T);
-  la = F.function(a,data);
-  lb = logLik(b,data);
-  lm = logLik(m,data);
+  /* la = F.function(a,data); */
+  /* lb = logLik(b,data); */
+  /* lm = logLik(m,data); */
   /* printf("la: %e; lm: %e; lb: %e\n",la,lm,lb); */
-  while(!(lm<la && lm<lb)){
-    b = m;
-    m = b/2.;
-    la = logLik(a,data);
-    lb = logLik(b,data);
-    lm = logLik(m,data);
-  }
+  /* while(!(lm<la && lm<lb)){ */
+  /*   b = m; */
+  /*   m = b/2.; */
+  /*   la = logLik(a,data); */
+  /*   lb = logLik(b,data); */
+  /*   lm = logLik(m,data); */
+  /* } */
   /* printf("la: %e; lm: %e; lb: %e\n",la,lm,lb); */
   gsl_min_fminimizer_set (s, &F, m, a, b);
   do {

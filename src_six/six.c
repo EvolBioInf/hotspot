@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
   Args *args;
   gsl_rng *r;
 
-  version = "0.1";
+  version = "0.2";
   setprogname2("six");
   args = getArgs(argc, argv);
   if(args->v)
@@ -41,10 +41,12 @@ int main(int argc, char *argv[]){
   if(args->h || args->e)
     printUsage(version);
   r = ini_gsl_rng(args);
-  /* for(i=0;i<args->m;i++) */
-  /*   printf("args->mol[%d]: %d\n",i,args->mol[i]); */
+  printf("#Reg\tbp");
+  for(i=0;i<args->m;i++)
+    printf("\tm,n-k,k");
+  printf("\n");
   for(i=0;i<args->r;i++){
-    printf("SNP%d\t1000",i+1); 
+    printf("Reg%d\t1000",i+1); 
     runSim(args,r);
   }
   free_gsl_rng(r,args);
