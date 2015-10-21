@@ -14,13 +14,13 @@ Args *args;
 
 Args *getArgs(int argc, char *argv[]){
   char c;
-  char *optString = "hvr:m:n:l:s:";
+  char *optString = "hvr:m:n:x:s:";
   int i;
 
   args = (Args *)emalloc(sizeof(Args));
   args->m = DEFAULT_M;
   args->n = DEFAULT_N;
-  args->l = DEFAULT_L;
+  args->x = DEFAULT_X;
   args->r = DEFAULT_R;
   args->s = 0;
   args->mol = (int *)emalloc(DEFAULT_M*sizeof(int));
@@ -49,8 +49,8 @@ Args *getArgs(int argc, char *argv[]){
     case 'r':                           /* replicate experiments */
       args->r = atoi(optarg);
       break;
-    case 'l':                           /* lambda */
-      args->l = atof(optarg);
+    case 'x':                           /* crossover rate */
+      args->x = atof(optarg);
       break;
     case '?':                           /* fall-through is intentional */
     case 'h':                           /* print help */
@@ -74,13 +74,13 @@ Args *getArgs(int argc, char *argv[]){
 
 void printUsage(){
   printf("Usage: %s [options] [inputFiles]\n",progname());
-  printf("<EXPLANATION>\n");
-  printf("<EXAMPLE>\n");
+  printf("Purpose: Simulate crossover data for analysis with xov\n");
+  printf("Example: six\n");
   printf("Options:\n");
   printf("\t[-r <NUM> number of replicates; default: %d\n",DEFAULT_R);
   printf("\t[-m <NUM> number of experiments per replicate, followed by number of molecules per exp.; default: %d %d %d %d]\n", DEFAULT_M,DEFAULT_MM0,DEFAULT_MM1,DEFAULT_MM2);
   printf("\t[-n <NUM> number of replicates per experiment; default: %d]\n",DEFAULT_N);
-  printf("\t[-l <NUM> lambda in cM; default: %.1f\n",DEFAULT_L);
+  printf("\t[-x <NUM> crossover rate in cM; default: %.1f\n",DEFAULT_X);
   printf("\t[-s <NUM> seed for random number generator; default: generated internally]\n");
   printf("\t[-h print this help message and exit]\n");
   printf("\t[-v print program information and exit]\n");

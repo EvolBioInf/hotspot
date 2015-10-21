@@ -7,7 +7,7 @@
 #define DEFAULT_MM1 120
 #define DEFAULT_MM2 240
 #define DEFAULT_N 12
-#define DEFAULT_L 1.0
+#define DEFAULT_X 1.0
 
 /* define argument container */
 typedef struct args{
@@ -20,7 +20,7 @@ typedef struct args{
   int n;    /* number of replicates per experiment */
   int r;    /* number of replicates */
   int *mol; /* number of molecules per experiment */
-  float l;  /* lambda */
+  float x;  /* rate of crossover */
   int numInputFiles;
 } Args;
 
