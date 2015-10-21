@@ -12,7 +12,7 @@
 void runSim(Args *args, gsl_rng *r){
   int i, j, k, pos;
   double p;
-  p = (double)args->l / 100.;
+  p = (double)args->x / 100.;
   for(i=0;i<args->m;i++){
     pos = 0;
     for(j=0;j<args->n;j++){
