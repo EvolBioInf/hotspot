@@ -74,7 +74,7 @@ Args *getArgs(int argc, char *argv[]){
 
 void printUsage(){
   printf("Usage: %s [options] [inputFiles]\n",progname());
-  printf("Compute rate of crossover from experimental data\n");
+  printf("Purpose: Compute rate of crossover from experimental data\n");
   printf("Example: xov foo.dat\n");
   printf("Options:\n");
   printf("\t[-c <NUM> confidence interval; default: %.2f]\n",DEFAULT_C);
