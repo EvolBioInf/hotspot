@@ -16,6 +16,7 @@
 typedef struct esa{
   long *sa;                /* suffix array */
   long *lcp;               /* longest common prefix array */
+  long *isa;               /* inverse suffix array */
   long n;                  /* length of sa and lcp */
 } Esa;
 /* in esa.c */

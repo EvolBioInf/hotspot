@@ -27,23 +27,20 @@ long max3(long x1, long x2, long x3){
 
 /* complexity: compute match complexity from the number of match factors*/
 double complexity(Sequence *seq) {
-  long i, *isa, l1, l2;
+  long i, l1, l2;
   double l, c, esl, cObs, cMax, cMin, cNor, gc;
   Esa *esa;
   
   esa = getEsa(seq);
-  isa = (long *)emalloc((esa->n+1)*sizeof(long));
-  /* compute inverse suffix array */
-  for(i=0;i < esa->n;i++)
-    isa[esa->sa[i]] = i;
   /* prevent out of bounds error */
-  isa[esa->n] = 0;
+  esa->isa = (long *)erealloc(esa->isa,(esa->n+1)*sizeof(long));
+  esa->isa[esa->n] = 0;
   /* count match factors */
   c = 0;
   i = 0;
   while(i < esa->n){
-    l1 = esa->lcp[isa[i]];
-    l2 = esa->lcp[isa[i]+1];
+    l1 = esa->lcp[esa->isa[i]];
+    l2 = esa->lcp[esa->isa[i]+1];
     i += max3(l1,l2,1);
     c++;
   }
@@ -55,7 +52,6 @@ double complexity(Sequence *seq) {
   cMax = 1./(esl - 1.);
   cNor = (cObs - cMin)/(cMax - cMin);
 
-  free(isa);
   freeEsa();
 
   return cNor;

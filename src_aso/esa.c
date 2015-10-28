@@ -18,6 +18,11 @@
 #include "esa.h"
 
 Esa *globalEsa;
+long *globalIsa = NULL;
+
+long *getIsa(){
+  return globalIsa;
+}
 
 long *getSa(Sequence *seq){
   long i, n, *sa2;
@@ -66,7 +71,7 @@ long *getLcp(long *sa, Sequence *seq){
 	h--;
     }
   }
-  free(rank);
+  globalIsa = rank;
   return lcp;
 }
 
@@ -76,6 +81,7 @@ Esa *getEsa(Sequence *seq){
   esa = (Esa *)emalloc(sizeof(Esa));
   esa->sa = getSa(seq);
   esa->lcp = getLcp(esa->sa,seq);
+  esa->isa = getIsa();
   esa->n = seq->len;
 
   globalEsa = esa;
@@ -87,6 +93,7 @@ void freeEsa(){
 
   free(globalEsa->sa);
   free(globalEsa->lcp);
+  free(globalEsa->isa);
 
   free(globalEsa);
 }
