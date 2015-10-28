@@ -1,0 +1,20 @@
+hotspot - Software to Support Sperm-Typing for Detecting Recombination Hotspots
+Bernhard Haubold & Fabian Klötzl
+
+GETTING STARTED
+autoreconf -i
+./configure
+make
+make get-chr19-data-mus
+TEST asp
+asp -g ./data/mus/genome/ -s ./data/mus/vcf/ ./data/mus/exampleHotSpots19.txt
+TEST aso
+aso -g ./data/mus/genome/ -s ./data/mus/vcf/ ./data/mus/exampleHotSpots19.txt
+TEST UNIVERSALS IN aso
+aso -u -g ./data/mus/genome/ -s ./data/mus/vcf/ ./data/mus/exampleHotSpots19.txt 
+TEST xov
+xov ./data/mus/exampleResults.txt 
+TEST six
+./six
+TEST xov USING six
+./six | ./xov 
