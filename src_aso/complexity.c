@@ -33,8 +33,8 @@ double complexity(Sequence *seq) {
   
   esa = getEsa(seq);
   /* prevent out of bounds error */
-  esa->isa = (long *)erealloc(esa->isa,(esa->n+1)*sizeof(long));
-  esa->isa[esa->n] = 0;
+  esa->lcp = (long *)erealloc(esa->lcp,(esa->n+1)*sizeof(long));
+  esa->lcp[esa->n] = 0;
   /* count match factors */
   c = 0;
   i = 0;
