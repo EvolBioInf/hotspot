@@ -1,7 +1,7 @@
-SUBDIRS= common src_xov src_aso src_asp
+SUBDIRS= common src_xov src_aso src_asp src_six
 
 # Helpers for downloading data
-.PHONY: get-data-mus
+.PHONY: get-all-data-mus get-chr19-data-mus
 
 get-all-data-mus:
 	mkdir -p data/mus/genome;

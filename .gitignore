@@ -4,6 +4,7 @@ common/libcommon.a
 src_aso/aso
 src_asp/asp
 src_xov/xov
+src_six/six
 
 # Autotools
 config.*

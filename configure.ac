@@ -53,6 +53,7 @@ AC_CONFIG_FILES([
  src_xov/Makefile
  src_aso/Makefile
  src_asp/Makefile
+ src_six/Makefile
 ])
 AC_OUTPUT
 
