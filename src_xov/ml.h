@@ -17,13 +17,16 @@ typedef struct data{
   int *numMol;
   double mlXover;
   double ci;
+  char o;
 } Data;
 
-Data *newData(int maxN);
+Data *newData(int maxN, int poi);
 void expandData(Data *d);
 double crossoverFreq(Data *data);
 double upperCL(Data *data, double mlEst);
 double lowerCL(Data *data, double mlEst);
 void printLikFun(Data *data, Args *args);
+void printData(char *name, int len, Data *data);
+void freeData(Data *data);
 
 #endif

@@ -13,7 +13,7 @@
 #include "ml.h"
 #include "eprintf.h"
 
-double logLik(double lambda, void *param){
+double logLikPoi(double lambda, void *param){
   double ll, x, k;
   int i, n;
   Data *data;
@@ -22,13 +22,38 @@ double logLik(double lambda, void *param){
   data = (Data *)param;
   for(i=0;i<data->n;i++){
     x = data->numMol[i];
-    k = data->numPos[i];
-    n = k + data->numNeg[i];
-    if(lambda > 0.)
+    k = data->numNeg[i];
+    n = k + data->numPos[i];
+    if(lambda > 0.){
       ll += gsl_sf_lnchoose(n,k) - k*x*lambda+(n-k)*log(1-exp(-x*lambda));
+    }
   }
   if(ll == 0.)
     ll = DBL_MAX;
+  else
+    ll *= -1;
+  return ll;
+}
+
+double logLik(double r, void *param){
+  double ll,x, k, pnr;
+  int i, n;
+  Data *data;
+
+  if(r <= DBL_EPSILON || r >= 1.-DBL_EPSILON)
+    return DBL_MAX;
+
+  ll = 0;
+  data = (Data *)param;
+  for(i=0;i<data->n;i++){
+    x = data->numMol[i];
+    k = data->numNeg[i];
+    n = k + data->numPos[i];
+    pnr = pow(1.-r,x);
+    ll += gsl_sf_lnchoose(n,k) + k*x*log(1.-r) + (n-k)*log(1.-pnr);
+  }
+  if(ll == 0.)
+    ll = DBL_MAX/2.;
   else
     ll *= -1;
   return ll;
@@ -45,10 +70,17 @@ void printLikFun(Data *data, Args *args){
   ub = args->M/100.;
   step = (ub - x)/(double)args->i;
   while(x <= ub){
-    if(x>0)
-      l = -logLik(x, data);
-    else
-      l = -logLik(DBL_EPSILON, data);
+    if(x>0){
+      if(args->o)
+	l = -logLikPoi(x, data);
+      else
+	l = -logLik(x, data);
+    }else{
+      if(args->o)
+	l = -logLikPoi(DBL_EPSILON, data);
+      else
+	l = -logLik(DBL_EPSILON, data);
+    }
     printf("%.3f\t%.3e\n",x*100.,l);
     x += step;  
   }
@@ -61,15 +93,30 @@ double crossoverFreq(Data *data){
   gsl_min_fminimizer *s;
   double m = 0.5;
   double a = 0.0, b = 1.0;
+  /* double la, lm, lb; */
   gsl_function F;
 
-  F.function = &logLik;
+  if(data->o)
+    F.function = &logLikPoi;
+  else
+    F.function = &logLik;
   F.params = data;
 
   T = gsl_min_fminimizer_brent;
   s = gsl_min_fminimizer_alloc (T);
+  /* la = F.function(a,data); */
+  /* lb = logLik(b,data); */
+  /* lm = logLik(m,data); */
+  /* printf("la: %e; lm: %e; lb: %e\n",la,lm,lb); */
+  /* while(!(lm<la && lm<lb)){ */
+  /*   b = m; */
+  /*   m = b/2.; */
+  /*   la = logLik(a,data); */
+  /*   lb = logLik(b,data); */
+  /*   lm = logLik(m,data); */
+  /* } */
+  /* printf("la: %e; lm: %e; lb: %e\n",la,lm,lb); */
   gsl_min_fminimizer_set (s, &F, m, a, b);
-
   do {
       iter++;
       status = gsl_min_fminimizer_iterate (s);
@@ -78,26 +125,32 @@ double crossoverFreq(Data *data){
       a = gsl_min_fminimizer_x_lower (s);
       b = gsl_min_fminimizer_x_upper (s);
 
-      status = gsl_min_test_interval (a, b, 0.00000001, 0.0);
-    }  while (status == GSL_CONTINUE && iter < max_iter);
+      status = gsl_min_test_interval (a, b, DBL_MIN, 0.0);
+  }  while (status == GSL_CONTINUE && iter < max_iter);
+  gsl_min_fminimizer_free(s);
   return (a+b)/2.;
 }
 
-Data *newData(int maxN){
+Data *newData(int maxN, int poi){
   Data *d;
   d = (Data *)emalloc(sizeof(Data));
   d->n = 0;
   d->numPos = (int *)emalloc(maxN * sizeof(int));
   d->numNeg = (int *)emalloc(maxN * sizeof(int));
   d->numMol = (int *)emalloc(maxN * sizeof(int));
+  d->maxN = maxN;
+  if(poi)
+    d->o = 1;
+  else
+    d->o = 0;
   return d;
 }
 
 void expandData(Data *d){
   d->maxN *= 2;
-  d->numPos = (int *)emalloc(d->maxN * sizeof(int));
-  d->numNeg = (int *)emalloc(d->maxN * sizeof(int));
-  d->numMol = (int *)emalloc(d->maxN * sizeof(int));
+  d->numPos = (int *)erealloc(d->numPos,d->maxN * sizeof(int));
+  d->numNeg = (int *)erealloc(d->numNeg,d->maxN * sizeof(int));
+  d->numMol = (int *)erealloc(d->numMol,d->maxN * sizeof(int));
 }
 
 
@@ -106,8 +159,13 @@ double likConf(double lambda, void *param){
   Data *data;
 
   data = (Data *)param;
-  ml = logLik(data->mlXover, param);
-  ll = logLik(lambda, param);
+  if(data->o){
+    ml = logLikPoi(data->mlXover, param);
+    ll = logLikPoi(lambda, param);
+  }else{
+    ml = logLik(data->mlXover, param);
+    ll = logLik(lambda, param);
+  }
   x = gsl_cdf_chisq_Pinv(data->ci,1)/2.;
   l = ll - ml - x;
 
@@ -123,23 +181,29 @@ double upperCL(Data *data, double mlEst){
     gsl_function fun;
     double xLo, xHi;
 
+    
     fun.function = &likConf;
     fun.params = data;
 
     solverType = gsl_root_fsolver_brent;
-
     s = gsl_root_fsolver_alloc(solverType);
     /* search for upper bound */
     xLo = mlEst;
-    xHi = 1.0;
+    if(xLo < 1.0)
+      xHi = 1.0;
+    else
+      return 1.0;
+    xHi = 1.0 - DBL_EPSILON;
     status = gsl_root_fsolver_set(s,&fun,xLo,xHi);
     do{
 	iter++;
 	status = gsl_root_fsolver_iterate(s);
 	xLo = gsl_root_fsolver_x_lower(s);
 	xHi = gsl_root_fsolver_x_upper(s);
-	status = gsl_root_test_interval(xLo, xHi, 0, 0.0000001);
+	status = gsl_root_test_interval(xLo, xHi, 0, 0.001);
     }while(status == GSL_CONTINUE && iter < max_iter);
+
+    gsl_root_fsolver_free(s);
     return (xLo + xHi) / 2.0;
 }
 
@@ -156,18 +220,37 @@ double lowerCL(Data *data, double mlEst){
     fun.params = data;
 
     solverType = gsl_root_fsolver_brent;
-
     s = gsl_root_fsolver_alloc(solverType);
     /* search for lower bound */
-    xLo = 0.;
+    xLo = 0. + DBL_EPSILON;
     xHi = mlEst;
+    if(xHi == 0.)
+      return 0.;
     status = gsl_root_fsolver_set(s,&fun,xLo,xHi);
     do{
 	iter++;
 	status = gsl_root_fsolver_iterate(s);
 	xLo = gsl_root_fsolver_x_lower(s);
 	xHi = gsl_root_fsolver_x_upper(s);
-	status = gsl_root_test_interval(xLo, xHi, 0, DBL_EPSILON);
+	status = gsl_root_test_interval(xLo, xHi, 0, 0.001);
     }while(status == GSL_CONTINUE && iter < max_iter);
+    gsl_root_fsolver_free(s);
+
     return (xLo + xHi) / 2.0;
+}
+
+void printData(char *name, int len, Data *data){
+  int i;
+
+  printf("%s\t%d\t%d,%d,%d",name,len,data->numMol[0],data->numPos[0],data->numNeg[0]);
+  for(i=1;i<data->n;i++)
+    printf("\t%d,%d,%d",data->numMol[i],data->numPos[i],data->numNeg[i]);
+  printf("\n");
+}
+
+void freeData(Data *data){
+  free(data->numPos);
+  free(data->numNeg);
+  free(data->numMol);
+  free(data);
 }

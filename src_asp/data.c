@@ -77,7 +77,8 @@ FILE *hotSpotSnp(Args *args, int start, int end) {
   if(check == -1){
     err(1, "Out of mem?");
   }
-
+  if(args->b)
+    printf("%s\n",cmd);
   /* open pipeline for retrieving SNPs */
   sp = popen(cmd, "r");
   if (sp == NULL) {
