@@ -8,6 +8,7 @@ AC_PROG_MAKE_SET
 AC_PROG_CPP
 AC_PROG_RANLIB
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+AC_PROG_GREP
 
 # Execute all tests using C
 AC_LANG(C)
@@ -20,6 +21,12 @@ AC_CHECK_LIB(divsufsort, divsufsort, [], [have_libdivsufsort=no])
 
 AS_IF([test "x$have_libdivsufsort" = "xno"],
 	[AC_MSG_ERROR([Configuration for libdivsufsort failed. Please install libdivsufsort.])
+])
+
+# Check for tabix
+AC_CHECK_PROG(TABIX_CHECK,tabix,yes)
+AS_IF([test x"$TABIX_CHECK" != x"yes"],
+    [AC_MSG_ERROR([Please install tabix.])
 ])
 
 AC_CHECK_LIB([gslcblas],[cblas_dgemm])
