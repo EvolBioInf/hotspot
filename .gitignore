@@ -22,3 +22,7 @@ depcomp
 install-sh
 missing
 stamp-h1
+
+# data files
+data/*
+!data/mus/example*.txt
