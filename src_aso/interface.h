@@ -3,7 +3,7 @@
 
 #define DEFAULT_L 17 /* default oligo length */
 #define DEFAULT_LU 100                /* default length of universals */
-#define DEFAULT_D 600                 /* default distance between universals */
+#define DEFAULT_D 200                 /* default distance between universals */
 
 /* define argument container */
 typedef struct args{
