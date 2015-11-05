@@ -39,6 +39,7 @@ Args *getArgs(int argc, char *argv[]){
       args->mol = (int *)erealloc(args->mol,sizeof(int)*args->m);
       for(i=0;i<args->m;i++)
 	args->mol[i] = atoi(argv[optind+i]);
+	/* args->mol[i] = atoi(argv[optind++]); */
       break;
     case 's':                           /* seed for random number generator */
       args->s = atoi(optarg);

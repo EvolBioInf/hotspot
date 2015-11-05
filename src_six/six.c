@@ -22,7 +22,7 @@ void runSim(Args *args, gsl_rng *r){
 	  break;
 	}
     }
-    printf("\t%d,%d,%d",args->mol[i],pos,args->n-pos);
+    printf("\t%d|%d|%d",args->mol[i],pos,args->n-pos);
   }
   printf("\n");
 }
@@ -41,12 +41,12 @@ int main(int argc, char *argv[]){
   if(args->h || args->e)
     printUsage(version);
   r = ini_gsl_rng(args);
-  printf("#Reg\tbp");
+  printf("#Rep\tStart\tEnd");
   for(i=0;i<args->m;i++)
-    printf("\tm,n-k,k");
+    printf("\tm|n-k|k");
   printf("\n");
   for(i=0;i<args->r;i++){
-    printf("Reg%d\t1000",i+1); 
+    printf("Rep%d\t15,000,000\t15,002,000",i+1); 
     runSim(args,r);
   }
   free_gsl_rng(r,args);

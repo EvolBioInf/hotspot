@@ -12,16 +12,34 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 #include <gsl/gsl_cdf.h>
 #include "interface.h"
 #include "eprintf.h"
 #include "ml.h"
 
+/* intVal: return integer value of string */
+int intVal(char *str){
+  int l, i, j;
+  char *num;
+
+  num = (char *)emalloc(256);
+  l = strlen(str);
+  j = 0;
+  for(i=0;i<l;i++)
+    if(isdigit(str[i]))
+      num[j++] = str[i];
+  num[j] = '\0';
+  
+  free(num);
+  return atoi(num);
+}
+
 void scanFile(Args *args, FILE *fp){
   char *line, *name, *token;
   size_t n;
-  int status, len;
-  int pos[2], p, i, l, tp, tn;
+  int status, len, l, start, end;
+  int pos[2], p, i, tp, tn;
   Data *data;
   double ll, ul, cf;
 
@@ -31,13 +49,16 @@ void scanFile(Args *args, FILE *fp){
       break;
   }
   if(!args->p)
-    printf("# SNP\tbp\t[cM\tcM\tcM]\n");
+    printf("# Int\tStart\tEnd\tLen\t[%%\t%%\t%%]\t[cM/Mb\tcM/Mb\tcM/Mb]\n");
   data = newData(1,args->o);
   while(status != -1){
     data->n = 0;
-    name = estrdup(strtok(line,"\t"));     /* read name of region */
-    token = strtok(NULL,"\t");    
-    len = atoi(token);            /* length of region in bp */
+    name = estrdup(strtok(line,"\t"));  /* read name of region */
+    token = strtok(NULL,"\t");          /* start position */
+    start = intVal(token);
+    token = strtok(NULL,"\t");          /* end position */
+    end = intVal(token);
+    len = end - start + 1;             /* length of region in bp */
     tp = 0; /* total positives */
     tn = 0; /* total negatives */
     while((token = strtok(NULL,"\t")) != NULL){ /* iterating across experiments */
@@ -46,7 +67,7 @@ void scanFile(Args *args, FILE *fp){
       l = strlen(token);
       p = 0;
       for(i=0;i<l;i++){  /* determine positions of commata */
-	if(token[i] == ','){
+	if(token[i] == '|'){
 	  token[i] = '\0';
 	  pos[p++] = i+1;
 	}
@@ -79,10 +100,15 @@ void scanFile(Args *args, FILE *fp){
     ll *= 100;
     cf *= 100;
     ul *= 100;
-    if(cf < 100)
-      printf("%s\t%*d\t%.3f\t%.3f\t%.3f\n",name,4,len,ll,cf,ul);
-    else
-      printf("%s\t%*d\tNA\tNA\tNA\n",name,4,len);
+    if(cf < 100){
+      printf("%s\t%d\t%d\t%*d\t%.3f\t%.3f\t%.3f",name,start,end,4,len,ll,cf,ul);
+      /* convert to cM per Mb */
+      ll = ll / len * 1000000;
+      cf = cf / len * 1000000;
+      ul = ul / len * 1000000;
+      printf("\t%.3f\t%.3f\t%.3f\n",ll,cf,ul);
+    }else
+      printf("%s\t%d\t%d\t%*d\tNA\tNA\tNA\tNA\tNA\tNA\n",name,start,end,4,len);
     status = getline(&line,&n,fp);
     free(name);
   } 
