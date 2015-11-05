@@ -3,6 +3,8 @@
 
 #define DEFAULT_MI 14   /* default minimal length */
 #define DEFAULT_MA 19   /* default maximal length */
+#define DEFAULT_UI 20   /* default minimal length of universals */
+#define DEFAULT_UA 25   /* default maximal length of universals */
 #define DEFAULT_O 0.5   /* optimal GC content */
 #define DEFAULT_F 5000  /* length of flanking region */
 #define DEFAULT_DF 200  /* distance between forward universals */

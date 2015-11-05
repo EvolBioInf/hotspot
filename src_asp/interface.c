@@ -15,7 +15,11 @@ Args *args;
 Args *getArgs(int argc, char *argv[]) {
   char c;
   char *optString = "hvubm:M:o:rg:s:f:d:D:";
+  short minLenIsSet;
+  short maxLenIsSet;
 
+  minLenIsSet = 0;
+  maxLenIsSet = 0;
   args = (Args *)emalloc(sizeof(Args));
   args->f = DEFAULT_F;
   args->m = DEFAULT_MI;
@@ -48,12 +52,14 @@ Args *getArgs(int argc, char *argv[]) {
       break;
     case 'm': /* minimum length */
       args->m = atoi(optarg);
+      minLenIsSet = 1;
       break;
     case 'b': /* print debugging information? */
       args->b = 1;
       break;
     case 'M': /* maximum length */
       args->M = atoi(optarg);
+      maxLenIsSet = 1;
       break;
     case 'r': /* reverse primer */
       args->r = 1;
@@ -93,6 +99,10 @@ Args *getArgs(int argc, char *argv[]) {
       args->d = DEFAULT_DF;
     if(args->D == -1)
       args->D = DEFAULT_DR;
+    if(!minLenIsSet)
+      args->m = DEFAULT_UI;
+    if(!maxLenIsSet)
+      args->M = DEFAULT_UA;
   }
   args->inputFiles = argv + optind;
   args->numInputFiles = argc - optind;
@@ -118,7 +128,7 @@ void printUsage() {
   printf("\t[-o NUM optimal GC content; default: %.2f]\n", DEFAULT_O);
   printf("\t[-f NUM length of flanking region; default: %d]\n", DEFAULT_F);
   printf("\t[-r reverse primer; default: forward]\n");
-  printf("\t[-u universals; default: allele-specific primers]\n");
+  printf("\t[-u universals of default lengths %d-%d; default: allele-specific primers]\n",DEFAULT_UI,DEFAULT_UA);
   printf("\t[-d NUM distance between forward universals; default: %d]\n",DEFAULT_DF);
   printf("\t[-D NUM distance between reverse universals; default: %d]\n",DEFAULT_DR);
   printf("\t[-b print debugging information]\n");
