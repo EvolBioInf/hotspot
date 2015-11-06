@@ -11,6 +11,7 @@
 #include "tab.h"
 #include "eprintf.h"
 #include "primers.h"
+#include "hotspot.h"
 
 void scanFile(FILE *fp, Args *args);
 
@@ -21,7 +22,7 @@ int main(int argc, char *argv[]) {
   FILE *fp;
 
   cmd = (char *)emalloc(256 * sizeof(char));
-  version = "0.2";
+  version = VERSION;
   setprogname2("asp");
   args = getArgs(argc, argv);
   if (args->v)

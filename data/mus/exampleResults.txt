@@ -3,10 +3,10 @@
 #   recombination products from human sperm.
 #   In: Keeney, S. (ed.), Meiosis, Volume 1,
 #   Molecular and Genetic Methods, Volume 557.
-#Int	Start	End	d|n-k|k	d|n-k|k	d|n-k|k
-Int1	1	500	2000|2|6	600|1|7	200|0|8
-Int2	1	250	2000|1|5	600|1|7	200|1|7
-Int3	1	250	2000|3|3	600|1|7	200|0|8
-Int4	1	500	2000|5|3	600|0|8	200|0|8
-Int5	1	1500	2000|0|8	600|0|8	200|0|8
-Int6	1	500	60|5|7	120|11|1	240|12|0
+# Int	Chr	Start	End	d|n-k|k	d|n-k|k	d|n-k|k
+Int1	1	1	500	2000|2|6	600|1|7	200|0|8
+Int2	1	1	250	2000|1|5	600|1|7	200|1|7
+Int3	1	1	250	2000|3|3	600|1|7	200|0|8
+Int4	1	1	500	2000|5|3	600|0|8	200|0|8
+Int5	1	1	1500	2000|0|8	600|0|8	200|0|8
+Int6	1	1	500	60|5|7	120|11|1	240|12|0

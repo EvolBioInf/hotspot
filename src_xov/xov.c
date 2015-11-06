@@ -17,6 +17,7 @@
 #include "interface.h"
 #include "eprintf.h"
 #include "ml.h"
+#include "hotspot.h"
 
 /* intVal: return integer value of string */
 int intVal(char *str){
@@ -36,7 +37,7 @@ int intVal(char *str){
 }
 
 void scanFile(Args *args, FILE *fp){
-  char *line, *name, *token;
+  char *line, *name, *token, *chr;
   size_t n;
   int status, len, l, start, end;
   int pos[2], p, i, tp, tn;
@@ -49,15 +50,14 @@ void scanFile(Args *args, FILE *fp){
       break;
   }
   if(!args->p)
-    printf("# Int\tStart\tEnd\tLen\t[%%\t%%\t%%]\t[cM/Mb\tcM/Mb\tcM/Mb]\n");
+    printf("# Int\tChr\tStart\tEnd\tLen\t[%%\t%%\t%%]\t[cM/Mb\tcM/Mb\tcM/Mb]\n");
   data = newData(1,args->o);
   while(status != -1){
     data->n = 0;
-    name = estrdup(strtok(line,"\t"));  /* read name of region */
-    token = strtok(NULL,"\t");          /* start position */
-    start = intVal(token);
-    token = strtok(NULL,"\t");          /* end position */
-    end = intVal(token);
+    name = estrdup(strtok(line,"\t")); /* read name of region */
+    chr = estrdup(strtok(NULL,"\t"));  /* read chromosome */
+    start = intVal(strtok(NULL,"\t")); /* start position */
+    end = intVal(strtok(NULL,"\t"));   /* end position */
     len = end - start + 1;             /* length of region in bp */
     tp = 0; /* total positives */
     tn = 0; /* total negatives */
@@ -101,7 +101,7 @@ void scanFile(Args *args, FILE *fp){
     cf *= 100;
     ul *= 100;
     if(cf < 100){
-      printf("%s\t%d\t%d\t%*d\t%.3f\t%.3f\t%.3f",name,start,end,4,len,ll,cf,ul);
+      printf("%s\t%s\t%d\t%d\t%*d\t%.3f\t%.3f\t%.3f",name,chr,start,end,4,len,ll,cf,ul);
       /* convert to cM per Mb */
       ll = ll / len * 1000000;
       cf = cf / len * 1000000;
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]){
   Args *args;
   FILE *fp;
 
-  version = "0.2";
+  version = VERSION;
   setprogname2("xov");
   args = getArgs(argc, argv);
   if(args->v)

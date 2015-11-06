@@ -11,6 +11,7 @@
 #include "eprintf.h"
 #include "oligos.h"
 #include "data.h"
+#include "hotspot.h"
 
 void scanFile(FILE *fp, Args *args) {
   Sequence *seq = NULL;
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
   FILE *fp;
 
   cmd = (char *)emalloc(256 * sizeof(char));
-  version = "0.2";
+  version = VERSION;
   setprogname2("aso");
   args = getArgs(argc, argv);
   if (args->v)

@@ -8,6 +8,7 @@
 #include "gsl_rng.h"
 #include "interface.h"
 #include "eprintf.h"
+#include "hotspot.h"
 
 void runSim(Args *args, gsl_rng *r){
   int i, j, k, pos;
@@ -33,7 +34,7 @@ int main(int argc, char *argv[]){
   Args *args;
   gsl_rng *r;
 
-  version = "0.2";
+  version = VERSION;
   setprogname2("six");
   args = getArgs(argc, argv);
   if(args->v)
@@ -41,12 +42,12 @@ int main(int argc, char *argv[]){
   if(args->h || args->e)
     printUsage(version);
   r = ini_gsl_rng(args);
-  printf("#Rep\tStart\tEnd");
+  printf("# Int\tChr\tStart\tEnd");
   for(i=0;i<args->m;i++)
-    printf("\tm|n-k|k");
+    printf("\td|n-k|k");
   printf("\n");
   for(i=0;i<args->r;i++){
-    printf("Rep%d\t15,000,000\t15,002,000",i+1); 
+    printf("Int%d\t1\t15,000,001\t15,002,000",i+1); 
     runSim(args,r);
   }
   free_gsl_rng(r,args);

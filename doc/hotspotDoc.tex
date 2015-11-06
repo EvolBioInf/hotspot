@@ -15,28 +15,27 @@
 \newcommand{\I}{\item}
 \newcommand{\ty}{\texttt}
 \newcommand{\kr}{K_{\rm r}}
-\newcommand{\version}{0.2}
+\newcommand{\version}{0.3}
 \textwidth=16cm
 \textheight=23cm
 \begin{document}
 \title{\ty{hotspot}, v. \version: Software to Support Sperm-Typing for
-Detecting Recombination Hotspots}
+Investigating Recombination Hotspots}
 \author{Bernhard Haubold\\\small Max-Planck-Institute for Evolutionary Biology, Pl\"on, Germany}
 \maketitle
 \section{Introduction}
 \ty{hotspot} is a software package for detecting and analyzing
-recombination hotspots. This is carried out in three steps:
+recombination hotspots \cite{ode15:hot}. This is done in three steps:
 Preparation of allele-specific PCR, the actual PCR, and analysis of
 the PCR products. \ty{hotspot} contains the two programs \ty{asp} and \ty{aso} for designing
 allele-specific primers and oligos used in the pre-PCR phase. In
-addition, it contains \ty{rr} for computing the rate of recombination
-during the post-PCR phase of a project. In addition, the package
-contains example input data and a script for downloading the mouse
-genome sequence and the corresponding SNP data.
+addition, it contains \ty{xov} for computing the rate of recombination
+during the post-PCR phase of a project and the program \ty{six} for simulating input to \ty{xov}. Example input data, and a script for downloading the mouse
+genome sequence and the corresponding SNP data are also provided.
 
 \section{Dependencies}
 \bi
-\I \ty{libdivsufsort}: \ty{https://code.google.com/p/libdivsufsort/}
+\I \ty{libdivsufsort}: \ty{https://github.com/y-256/libdivsufsort/}
 \I \ty{tabix}: part of SAMtools~\cite{li09:seq},
 \ty{http://www.htslib.org/}
 \I \ty{gsl}: Gnu Scientific Library, \ty{http://www.gnu.org/software/gsl/}
@@ -45,7 +44,7 @@ genome sequence and the corresponding SNP data.
 \subsection{\ty{aso}}
 \ty{aso} is a program for designing allele-specific oligonucleotides that are
 complementary to SNPs contained in recombination hotspots. The program
-can also find oligos that do not intersect any SNPs or indels. 
+can also find universal oligos that do not intersect any known SNPs or indels. 
 
 \subsection{\ty{asp}}
 \ty{asp} is a program for designing PCR primers that have a 3'-end
@@ -55,21 +54,26 @@ length. Within these bounds the program searches for the primer length
 that comes closest to an optimal GC-content, which the user can also
 set.
 
-\subsection{\ty{rr}}
-\ty{rr} implements a maximum likelihood procedure for estimating the
+\subsection{\ty{xov}}
+\ty{xov} implements a maximum likelihood procedure for estimating the
 number of crossover events from the observed number of positive and
 negative allele-specific PCR reactions. In addition, it uses the
 likelihood ratio method for estimating a confidence interval. By
 default this interval is set to 95\%, but the user can set it to any
 level desired.
 
+\subsection{\ty{six}}
+\ty{six} simulates typing data given some crossover rate. This can be
+used for checking the accuracy of \ty{xov}, and for testing assay
+designs. 
+
 \section{Getting Started}
-\ty{aso} and \ty{asp} are written in C on a computer running Linux and
+The four programs that make up \ty{hotspot} are written in C on a computer running Linux and
 they should
-work on any standard UNIX system. However, please contact me at
+work on any UNIX system. However, please contact me at
 \ty{haubold@evolbio.mpg.de} if you have any problems with the
 programs. The following sections give a tutorial introduction to using
-the \ty{aso} and \ty{asp}.
+the components of \ty{hotspot}.
 
 \subsection{\ty{aso}}
 \bi
@@ -77,8 +81,7 @@ the \ty{aso} and \ty{asp}.
 \begin{verbatim}
 ls aso -h
 \end{verbatim}
-\I Hotspot locations are supplied in a tab-delimited file containing
-three columns: chromosome, start, and end. Take a look at two the
+\I Take a look at two the
 example hotspot coordinates supplied with the program
 \begin{verbatim}
 cat data/mus/exampleHotSpots19.txt 
@@ -96,7 +99,7 @@ int2	chr19	3804782	3808182
 \end{verbatim}
 Rows starting with a hash are comments and there can be as many
 comments as you like. This is followed by the hotspot data in four
-columns: Hotspot name, chromosome, start, and end.
+columns: Hotspot name (interval), chromosome, start, and end.
 \I The two example hotspots come from chromosome 19. To load the
 genome and SNP data for chromosome 19, execute 
 \begin{verbatim}
@@ -114,16 +117,16 @@ ls data/mus/vcf/
 \begin{verbatim}
 aso -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt |
 head
-int1	rs37745172	19	3796745	GGCATAAGCCTGTGGTT	GGCATAAGTCTGTGGTT
-int1	rs214526021	19	3797057	GTGAGTTCGAGGCCAGC	GTGAGTTCAAGGCCAGC
-int1	rs232006218	19	3797126	AGCTTTTCCTCTTTTCT	AGCTTTTCTTCTTTTCT
-int1	rs254266733	19	3797132	TCCTCTTTTCTGCCTTT	TCCTCTTTCCTGCCTTT
-int1	rs212133110	19	3797168	CAGCCTCCTTGTTACTC	CAGCCTCCCTGTTACTC
-int1	rs243001379	19	3797209	TAGTAGCAGTTCGGCTC	TAGTAGCAATTCGGCTC
-int1	rs37665146	19	3797213	AGCAGTTCGGCTCATAC	AGCAGTTCAGCTCATAC
-int1	rs221355178	19	3797237	CATTGTTGCTGTTGCCA	CATTGTTGTTGTTGCCA
-int1	rs232704341	19	3797253	ACAGTGGTTTCTTGTGT	ACAGTGGTCTCTTGTGT
-int1	rs250384293	19	3797258	GGTTTCTTGTGTTTGGA	GGTTTCTTATGTTTGGA
+int1  rs37745172   19  3796745  GGCATAAGCCTGTGGTT  GGCATAAGTCTGTGGTT
+int1  rs214526021  19  3797057  GTGAGTTCGAGGCCAGC  GTGAGTTCAAGGCCAGC
+int1  rs232006218  19  3797126  AGCTTTTCCTCTTTTCT  AGCTTTTCTTCTTTTCT
+int1  rs254266733  19  3797132  TCCTCTTTTCTGCCTTT  TCCTCTTTCCTGCCTTT
+int1  rs212133110  19  3797168  CAGCCTCCTTGTTACTC  CAGCCTCCCTGTTACTC
+int1  rs243001379  19  3797209  TAGTAGCAGTTCGGCTC  TAGTAGCAATTCGGCTC
+int1  rs37665146   19  3797213  AGCAGTTCGGCTCATAC  AGCAGTTCAGCTCATAC
+int1  rs221355178  19  3797237  CATTGTTGCTGTTGCCA  CATTGTTGTTGTTGCCA
+int1  rs232704341  19  3797253  ACAGTGGTTTCTTGTGT  ACAGTGGTCTCTTGTGT
+int1  rs250384293  19  3797258  GGTTTCTTGTGTTTGGA  GGTTTCTTATGTTTGGA
 \end{verbatim}
 The output consists of four columns:
 \be
@@ -136,63 +139,73 @@ The output consists of four columns:
 \ee
 The two oligos only differ in the middle, the SNP position.
 \I Instead of printing allele-specific oligos, \ty{aso} can also find
-oligos that do not span any polymorphism. These are usually longer,
-say 100 bp (\ty{-l}) and are found in the non-SNP mode (\ty{-n}):
+oligos that do not span any polymorphism. These ``universals'' are usually longer,
+say 100 bp (\ty{-l}) and are found using \ty{-u}:
 \begin{verbatim}
-aso -n -l 100 -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | head
-int1	rs37745172	19	3796745	0.893	CCT...
-int1	rs251742220	19	3796933	1.000	GCA...
-int1	rs214526021	19	3797057	0.825	GAG...
-int1	rs212133110	19	3797168	0.928	TTG...
-int1	rs219156104	19	3797314	0.928	GGC...
-int1	rs225529556	19	3797430	0.825	CAA...
-int1	rs37178516	19	3797568	0.962	TAG...
-int1	rs250108111	19	3797711	0.962	GTT...
-int1	rs219305977	19	3797816	0.962	TGG...
-int1	rs255329313	19	3797981	0.928	CTA...
+aso -u -l 100 -g data/mus/genome               \
+-s data/mus/vcf data/mus/exampleHotSpots19.txt | 
+head
+int1  19  3796570  3796669  0.894  GAA...
+int1  19  3796869  3796968  1.000  GAG...
+int1  19  3797168  3797267  0.981  TTG...
+int1  19  3797467  3797566  0.941  GGG...
+int1  19  3797766  3797865  1.000  CCG...
+int1  19  3798065  3798164  1.000  GTG...
+int1  19  3798364  3798463  0.914  TTT...
+int1  19  3798663  3798762  0.894  TCT...
+int1  19  3798962  3799061  0.382  GCA...
+int1  19  3799261  3799360  1.000  TAA...
 \end{verbatim}
 The columns indicate
 \begin{enumerate}
 \item Interval name
-\item Name of SNP upsream of which the oligo is located
-\item Start position of oligo
-\item Complexity of oligo. This measure lies between zero and 1 with
+\item Start
+\item End
+\item Complexity. This measure lies between zero and 1 with
   zero being least complex; a sequence consisting of a single
   nucleotide would have zero complexity; random sequences with
-  equi-probable nucleotides have a complexity close to 1. We can sort
+  equi-probable nucleotides have an expected complexity of
+  1. Complexities $>1$ are truncated to 1. We can sort
   the output according to complexity:
 \begin{verbatim}
-aso -n -l 100 -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | 
-sort -n -k 5 | head
-int1	rs587144268	19	3798964	0.447	ACG...
-int2	rs214880222	19	3807503	0.515	CCC...
-int1	rs262734534	19	3799720	0.687	TTT...
-int1	rs214526021	19	3797057	0.825	GAG...
-int1	rs225529556	19	3797430	0.825	CAA...
-int1	rs246740259	19	3799189	0.825	ATA...
-int2	rs252557020	19	3807609	0.825	TTT...
-int2	rs223077599	19	3806147	0.859	TCT...
-int2	rs234318596	19	3806539	0.859	ACT...
-int2	rs255109107	19	3806426	0.859	TAC...
+aso -n -l 100 -g data/mus/genome               \
+-s data/mus/vcf data/mus/exampleHotSpots19.txt | 
+sort -n -k 5                                   | 
+head
+int1  19  3798962  3799061  0.382  GCA...
+int1  19  3796570  3796669  0.894  GAA...
+int1  19  3798663  3798762  0.894  TCT...
+int1  19  3798364  3798463  0.914  TTT...
+int1  19  3797467  3797566  0.941  GGG...
+int1  19  3797168  3797267  0.981  TTG...
+int1  19  3796869  3796968  1.000  GAG...
+int1  19  3797766  3797865  1.000  CCG...
+int1  19  3798065  3798164  1.000  GTG...
+int1  19  3799261  3799360  1.000  TAA...
 \end{verbatim}
 Notice the long microsatellelite in the top sequence. 
-\item Sequence
 \end{enumerate}
-\I Run \ty{asp} to find forward primers in a window of 5kb downstream
+\end{itemize}
+
+\subsection{\ty{asp}}
+\begin{itemize}
+\I Run \ty{asp} to find forward primers in a window of 5kb upstream
 of the start of the interval of interest:
+\footnotesize
 \begin{verbatim}
 asp -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | head
-int1	rs36588234	19	3791591	GATTCAGCCAACAA	0.29	GATTCAGCCAACAG	0.33
-int1	rs266164282	19	3791605	TTTAGATAGTTGGT	0.19	TTTAGATAGTTGGG	0.24
-int1	rs233070165	19	3791753	AGAAGAGCAGTCGG	0.38	AGAAGAGCAGTCGA	0.33
-int1	rs586881213	19	3791766	GGTGCTCTTACCCA	0.38	GGTGCTCTTACCCT	0.38
-int1	rs258256279	19	3791984	AGTTCCAGGACAGT	0.33	AGTTCCAGGACAGC	0.38
-int1	rs215047461	19	3792005	GCACATAAAAACTT	0.19	GCACATAAAAACTC	0.24
-int1	rs38604711	19	3792235	TATTTTGATTGCAGAAATT	0.15	TGATTGCAGAAATC	0.24
-int1	rs212603417	19	3792310	TTAAACCTCCCATT	0.24	TTAAACCTCCCATC	0.29
-int1	rs36316803	19	3792353	TATTGTCATGAGCA	0.24	TATTGTCATGAGCG	0.29
-int1	rs579758610	19	3792405	CATTACCCATGAGC	0.33	CATTACCCATGAGG	0.33
+int1  rs36588234   19  3791591  GATTCAGCCAACAA  0.43  34.4  GATTCAGCCAACAG  0.50  37.4
+int1  rs266164282  19  3791605  TTTAGATAGTTGGT  0.29  28.6  TTTAGATAGTTGGG  0.36  31.5
+int1  rs233070165  19  3791753  AGAAGAGCAGTCGG  0.57  40.3  AGAAGAGCAGTCGA  0.50  37.4
+int1  rs586881213  19  3791766  GGTGCTCTTACCCA  0.57  40.3  GGTGCTCTTACCCT  0.57  40.3
+int1  rs258256279  19  3791984  AGTTCCAGGACAGT  0.50  37.4  AGTTCCAGGACAGC  0.57  40.3
+int1  rs215047461  19  3792005  GCACATAAAAACTT  0.29  28.6  GCACATAAAAACTC  0.36  31.5
+int1  rs38604711   19  3792235  TGATTGCAGAAATT  0.29  28.6  TGATTGCAGAAATC  0.36  31.5
+int1  rs212603417  19  3792310  TTAAACCTCCCATT  0.36  31.5  TTAAACCTCCCATC  0.43  34.4
+int1  rs36316803   19  3792353  TATTGTCATGAGCA  0.36  31.5  TATTGTCATGAGCG  0.43  34.4
+int1  rs579758610  19  3792405  CATTACCCATGAGC  0.50  37.4  CATTACCCATGAGG  0.50  37.4
 \end{verbatim}
+\normalsize
 The output columns are
 \begin{enumerate}
 \I Interval name
@@ -201,27 +214,120 @@ The output columns are
 \I SNP position
 \I Primer for first allele
 \I GC-content for first primer
+\I Melting temperature for first primer
 \I Primer for second allele
 \I CG-content for second primer
+\I Melting temperature for second primer
 \end{enumerate}
-Notice that the two primers need not be of the same length. By
+\I To get the reverse primers in the upstream region, run
+\scriptsize
+\begin{verbatim}
+asp -r -g data/mus/genome                      \
+-s data/mus/vcf data/mus/exampleHotSpots19.txt | 
+head
+int1  rs249017060  19  3800119  AGAGTGAGTTCCAG       0.50  37.4  AGAGTGAGTTCCAA      0.43  34.4
+int1  rs218978784  19  3800120  CAGAGTGAGTTCCA       0.50  37.4  CAGAGTGAGTTCCC      0.57  40.3
+int1  rs235336981  19  3800166  GCATCCTTTAATCA       0.36  31.5  GCATCCTTTAATCC      0.43  34.4
+int1  rs584116440  19  3800176  CAGTGGTGATGCAT       0.50  37.4  CAGTGGTGATGCAC      0.57  40.3
+int1  rs253442444  19  3800434  CTCTCAAGTGCTGG       0.57  40.3  CTCTCAAGTGCTGA      0.50  37.4
+int1  rs214858261  19  3800484  TGCTCTATGAACCA       0.43  34.4  TGCTCTATGAACCT      0.43  34.4
+int1  rs232338632  19  3800485  TTGCTCTATGAACC       0.43  34.4  TTGCTCTATGAACT      0.36  31.5
+int1  rs261835571  19  3800506  TGGCTGTGGCTGTC       0.64  43.2  TGGCTGTGGCTGTT      0.57  40.3
+int1  rs222895727  19  3800511  TTATGTGGCTGTGG       0.50  37.4  TTATGTGGCTGTGT      0.43  34.4
+int1  rs579285301  19  3800535  TATTTATTTATTTTTGAGG  0.16  36.0  ATTTATTTATTTTTGAGA  0.11  32.1
+\end{verbatim}
+\normalsize
+Notice that the two primers need not have the same length. By
 default, \ty{asp} searches for a primer of length 14--19 with a
 GC-content as close to 0.5 as possible.
-\I To get the reverse primers in the upstream region, run
-\begin{verbatim}
-asp -r -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | head
-int1	rs249017060	19	3800119	AGAGTGAGTTCCAG	0.50	AGAGTGAGTTCCAA	0.43
-int1	rs218978784	19	3800120	CAGAGTGAGTTCCA	0.50	CAGAGTGAGTTCCC	0.57
-int1	rs235336981	19	3800166	GCATCCTTTAATCA	0.36	GCATCCTTTAATCC	0.43
-int1	rs584116440	19	3800176	CAGTGGTGATGCAT	0.50	CAGTGGTGATGCAC	0.57
-int1	rs253442444	19	3800434	CTCTCAAGTGCTGG	0.57	CTCTCAAGTGCTGA	0.50
-int1	rs214858261	19	3800484	TGCTCTATGAACCA	0.43	TGCTCTATGAACCT	0.43
-int1	rs232338632	19	3800485	TTGCTCTATGAACC	0.43	TTGCTCTATGAACT	0.36
-int1	rs261835571	19	3800506	TGGCTGTGGCTGTC	0.64	TGGCTGTGGCTGTT	0.57
-int1	rs222895727	19	3800511	TTATGTGGCTGTGG	0.50	TTATGTGGCTGTGT	0.43
-int1	rs579285301	19	3800535	TATTTATTTATTTTTGAGG	0.16	ATTTATTTATTTTTGAGA	0.11
-\end{verbatim}
 \ei
+
+\subsection{\ty{xov}}
+\begin{itemize}
+\item Take a look at example input for \ty{xov}
+\begin{verbatim}
+cat data/mus/exampleResults.txt 
+# This mock data set is taken from
+#   Kauppi et al. (2009). Analysis of human
+#   recombination products from human sperm.
+#   In: Keeney, S. (ed.), Meiosis, Volume 1,
+#   Molecular and Genetic Methods, Volume 557.
+# Int  Chr  Start  End  d|n-k|k   d|n-k|k   d|n-k|k
+Int1   1    1      500  2000|2|6  600|1|7   200|0|8
+Int2   1    1      250  2000|1|5  600|1|7   200|1|7
+Int3   1    1      250  2000|3|3  600|1|7   200|0|8
+Int4   1    1      500  2000|5|3  600|0|8   200|0|8
+Int5   1    1     1500  2000|0|8  600|0|8   200|0|8
+Int6   1    1      500  60|5|7    120|11|1  240|12|0
+\end{verbatim}
+The tab-delimited columns list
+\begin{enumerate}
+\item Interval
+\item Chromosome
+\item Start
+\item End
+\item number of molecules, number of positive PCR reactions, number of
+  negative PCR reactions; this triplet of values is repeated for each
+  experiment, three in this example
+\end{enumerate}
+\item Run \ty{xov}
+\small
+\begin{verbatim}
+xov data/mus/exampleResults.txt
+# Int  Chr  Start  End  Len  [%    %        %] [cM/Mb     cM/Mb    cM/Mb]
+Int1   1    1      500  500  0.004 0.015 0.039    7.448   30.004   78.119
+Int2   1    1      250  250  0.004 0.018 0.046   17.596   70.852  184.259
+Int3   1    1      250  250  0.008 0.027 0.063   33.291  107.923  253.801
+Int4   1    1      500  500  0.011 0.030 0.065   21.009   59.128  129.232
+Int5   1    1     1500 1500  0.000 0.000 0.009    0.000    0.000    5.716
+Int6   1    1      500  500  0.931 1.499 2.362 1862.604 2997.521 4723.249
+\end{verbatim}
+\normalsize
+Two sets of confidence intervals are computed: one for the
+\%-recombination frequency, the other for the standard measure of
+recombination, centi-Morgans per megabase (cM/Mb). These are obtained
+from the \%-frequencies as
+\[
+\mbox{cM/Mb}=\frac{\mbox{\%-freq}}{\mbox{Len}}\times 10^6.
+\]
+\end{itemize}
+
+\subsection{\ty{six}}
+\begin{itemize}
+\item Run \ty{six}
+\begin{verbatim}
+six 
+# Int  Chr  Start       End         m|n-k|k m|n-k|k  m|n-k|k
+Int1  1     15,000,001  15,002,000  60|8|4  120|10|2 240|12|0
+Int2  1     15,000,001  15,002,000  60|7|5  120|9|3  240|11|1
+Int3  1     15,000,001  15,002,000  60|8|4  120|7|5  240|12|0
+Int4  1     15,000,001  15,002,000  60|7|5  120|10|2 240|11|1
+Int5  1     15,000,001  15,002,000  60|5|7  120|8|4  240|9|3
+\end{verbatim}
+where the columns have the same meaning as explained above for
+\textit{exampleResults.txt}.
+\item Pipe the results of \ty{six} through \ty{xov}
+\small
+\begin{verbatim}
+six | xov 
+# Int  Chr  Start    End      Len  [%    %        %] [cM/Mb  cM/Mb     cM/Mb]
+Int1   1    15000001 15002000 2000 0.542 0.869 1.332 270.847 434.393  665.759
+Int2   1    15000001 15002000 2000 0.895 1.404 2.142 447.448 701.838 1070.429
+Int3   1    15000001 15002000 2000 0.688 1.083 1.645 343.656 541.430  822.117
+Int4   1    15000001 15002000 2000 0.534 0.855 1.307 266.739 427.079  652.990
+Int5   1    15000001 15002000 2000 0.905 1.447 2.259 452.265 723.175 1129.031
+\end{verbatim}
+\normalsize
+\item Check accuracy of \ty{xov}
+\begin{verbatim}
+six -r 1000 -x 1.5 | 
+./src_xov/xov      | 
+awk '!/^#/{s+=$7;c++}END{print s/c}'
+1.59407
+\end{verbatim}
+The simulated \%-crossover frequency (\ty{-x}) is 1.5, but the average
+estimate is 1.59. In other words, our estimator has an upward bias~\cite{ode15:hot}.
+\end{itemize}
 
 \bibliography{/home/haubold/References/references}
 \end{document}
