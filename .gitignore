@@ -26,3 +26,6 @@ stamp-h1
 # data files
 data/*
 !data/mus/example*.txt
+
+# random files
+src_six/randomSeed.dat
