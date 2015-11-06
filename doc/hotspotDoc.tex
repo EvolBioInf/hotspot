@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage{graphics,eurosym,latexsym}
 \usepackage{listings}
-\lstset{columns=fixed,basicstyle=\ttfamily,numbers=left,numberstyle=\tiny,stepnumber=5,breaklines=true}
+\lstset{columns=fixed,basicstyle=\ttfamily,numbers=none,numberstyle=\tiny,stepnumber=5,breaklines=true}
 \usepackage{times}
 % \usepackage[round]{natbib}
 % \bibliographystyle{plainnat}
@@ -30,8 +30,8 @@ Preparation of allele-specific PCR, the actual PCR, and analysis of
 the PCR products. \ty{hotspot} contains the two programs \ty{asp} and \ty{aso} for designing
 allele-specific primers and oligos used in the pre-PCR phase. In
 addition, it contains \ty{xov} for computing the rate of recombination
-during the post-PCR phase of a project and the program \ty{six} for simulating input to \ty{xov}. Example input data, and a script for downloading the mouse
-genome sequence and the corresponding SNP data are also provided.
+during the post-PCR phase of a project and the program \ty{six} for simulating input to \ty{xov}. Example input data and a script for downloading the mouse
+genome sequence including the corresponding SNP data are also provided.
 
 \section{Dependencies}
 \bi
@@ -40,51 +40,62 @@ genome sequence and the corresponding SNP data are also provided.
 \ty{http://www.htslib.org/}
 \I \ty{gsl}: Gnu Scientific Library, \ty{http://www.gnu.org/software/gsl/}
 \ei
+All three programs are also available via \ty{apt-get} and similar
+package managers.
+
+\section{Installation}
+The four programs that make up \ty{hotspot} are written in C on a computer running Linux and
+they should
+work on any UNIX system. However, please contact me at
+\ty{haubold@evolbio.mpg.de} if you have any problems with the
+programs. 
+\bi
+\item Clone the \texttt{github} repository
+\lstset{language=bash}
+\begin{lstlisting}
+git clone https://github.com/evolBioInf/hotspot.git
+\end{lstlisting}
+\item Change into the newly created directory \ty{hotspot}
+\begin{lstlisting}
+cd hotspot
+\end{lstlisting}
+\item Construct the configuration files
+\begin{lstlisting}
+autoreconf -i
+\end{lstlisting}
+\item Configure the package
+\begin{lstlisting}
+./configure
+\end{lstlisting}
+\item Compile
+\begin{lstlisting}
+make
+\end{lstlisting}
+\item Install
+\begin{lstlisting}
+sudo make install
+\end{lstlisting}
+If instead of using \texttt{make install} you would like to install the binaries by hand, copy them
+from the \ty{src\_*} directories.
+\ei
+
+\section{Getting Started}
+The following sections give a tutorial introduction to using
+the components of \ty{hotspot}.
 
 \subsection{\ty{aso}}
 \ty{aso} is a program for designing allele-specific oligonucleotides that are
 complementary to SNPs contained in recombination hotspots. The program
 can also find universal oligos that do not intersect any known SNPs or indels. 
-
-\subsection{\ty{asp}}
-\ty{asp} is a program for designing PCR primers that have a 3'-end
-complementary to SNPs in the regions flanking a recombination
-hotspot. The user can set a maximal and a minimal primer
-length. Within these bounds the program searches for the primer length
-that comes closest to an optimal GC-content, which the user can also
-set.
-
-\subsection{\ty{xov}}
-\ty{xov} implements a maximum likelihood procedure for estimating the
-number of crossover events from the observed number of positive and
-negative allele-specific PCR reactions. In addition, it uses the
-likelihood ratio method for estimating a confidence interval. By
-default this interval is set to 95\%, but the user can set it to any
-level desired.
-
-\subsection{\ty{six}}
-\ty{six} simulates typing data given some crossover rate. This can be
-used for checking the accuracy of \ty{xov}, and for testing assay
-designs. 
-
-\section{Getting Started}
-The four programs that make up \ty{hotspot} are written in C on a computer running Linux and
-they should
-work on any UNIX system. However, please contact me at
-\ty{haubold@evolbio.mpg.de} if you have any problems with the
-programs. The following sections give a tutorial introduction to using
-the components of \ty{hotspot}.
-
-\subsection{\ty{aso}}
 \bi
 \I List options
-\begin{verbatim}
-ls aso -h
-\end{verbatim}
+\begin{lstlisting}
+aso -h
+\end{lstlisting}
 \I Take a look at two the
 example hotspot coordinates supplied with the program
-\begin{verbatim}
-cat data/mus/exampleHotSpots19.txt 
+\begin{lstlisting}
+$ cat data/mus/exampleHotSpots19.txt 
 # NB: These mouse hotspot data by Smagulova et al. (2011) are provided 
 #   as part of the aspro software package for designing
 #   Allele-Specific PRimers and Oligos. The hotspot coordinates by
@@ -96,25 +107,25 @@ cat data/mus/exampleHotSpots19.txt
 # int   chr	start	end
 int1	chr19	3796569	3799969
 int2	chr19	3804782	3808182
-\end{verbatim}
+\end{lstlisting}
 Rows starting with a hash are comments and there can be as many
 comments as you like. This is followed by the hotspot data in four
-columns: Hotspot name (interval), chromosome, start, and end.
+tab-delimited columns: Hotspot name (interval), chromosome, start, and end.
 \I The two example hotspots come from chromosome 19. To load the
 genome and SNP data for chromosome 19, execute 
-\begin{verbatim}
+\begin{lstlisting}
 make get-chr19-data-mus 
-\end{verbatim}
-\I Check that the genome data was downloaded:
-\begin{verbatim}
+\end{lstlisting}
+\I Verify that the genome data was downloaded:
+\begin{lstlisting}
 ls data/mus/genome/
-\end{verbatim}
+\end{lstlisting}
 \I Check that the SNP data was downloaded:
-\begin{verbatim}
+\begin{lstlisting}
 ls data/mus/vcf/
-\end{verbatim}
+\end{lstlisting}
 \I Now run \ty{aso}
-\begin{verbatim}
+\begin{lstlisting}
 aso -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt |
 head
 int1  rs37745172   19  3796745  GGCATAAGCCTGTGGTT  GGCATAAGTCTGTGGTT
@@ -127,8 +138,8 @@ int1  rs37665146   19  3797213  AGCAGTTCGGCTCATAC  AGCAGTTCAGCTCATAC
 int1  rs221355178  19  3797237  CATTGTTGCTGTTGCCA  CATTGTTGTTGTTGCCA
 int1  rs232704341  19  3797253  ACAGTGGTTTCTTGTGT  ACAGTGGTCTCTTGTGT
 int1  rs250384293  19  3797258  GGTTTCTTGTGTTTGGA  GGTTTCTTATGTTTGGA
-\end{verbatim}
-The output consists of four columns:
+\end{lstlisting}
+The tab-delimited output consists of six columns:
 \be
 \I Interval name
 \I SNP name
@@ -140,8 +151,8 @@ The output consists of four columns:
 The two oligos only differ in the middle, the SNP position.
 \I Instead of printing allele-specific oligos, \ty{aso} can also find
 oligos that do not span any polymorphism. These ``universals'' are usually longer,
-say 100 bp (\ty{-l}) and are found using \ty{-u}:
-\begin{verbatim}
+say 100 bp (\ty{-l}) and are constructed when using \ty{-u}:
+\begin{lstlisting}
 aso -u -l 100 -g data/mus/genome               \
 -s data/mus/vcf data/mus/exampleHotSpots19.txt | 
 head
@@ -155,19 +166,18 @@ int1  19  3798364  3798463  0.914  TTT...
 int1  19  3798663  3798762  0.894  TCT...
 int1  19  3798962  3799061  0.382  GCA...
 int1  19  3799261  3799360  1.000  TAA...
-\end{verbatim}
+\end{lstlisting}
 The columns indicate
 \begin{enumerate}
 \item Interval name
 \item Start
 \item End
-\item Complexity. This measure lies between zero and 1 with
-  zero being least complex; a sequence consisting of a single
+\item Complexity. This measure lies between 0 and 1; a sequence consisting of a single
   nucleotide would have zero complexity; random sequences with
   equi-probable nucleotides have an expected complexity of
-  1. Complexities $>1$ are truncated to 1. We can sort
+  1. Complexities greater than 1 are truncated to 1. We can sort
   the output according to complexity:
-\begin{verbatim}
+\begin{lstlisting}
 aso -n -l 100 -g data/mus/genome               \
 -s data/mus/vcf data/mus/exampleHotSpots19.txt | 
 sort -n -k 5                                   | 
@@ -182,17 +192,24 @@ int1  19  3796869  3796968  1.000  GAG...
 int1  19  3797766  3797865  1.000  CCG...
 int1  19  3798065  3798164  1.000  GTG...
 int1  19  3799261  3799360  1.000  TAA...
-\end{verbatim}
+\end{lstlisting}
 Notice the long microsatellelite in the top sequence. 
 \end{enumerate}
 \end{itemize}
 
 \subsection{\ty{asp}}
+\ty{asp} is a program for designing PCR primers that have a 3'-end
+complementary to SNPs in the regions flanking a recombination
+hotspot. The user can set a maximal and a minimal primer
+length. Within these bounds the program searches for the primer length
+that comes closest to an optimal GC-content, which the user can also
+set.
+
 \begin{itemize}
 \I Run \ty{asp} to find forward primers in a window of 5kb upstream
-of the start of the interval of interest:
+of the start of the candidate interval:
 \footnotesize
-\begin{verbatim}
+\begin{lstlisting}
 asp -g data/mus/genome -s data/mus/vcf data/mus/exampleHotSpots19.txt | head
 int1  rs36588234   19  3791591  GATTCAGCCAACAA  0.43  34.4  GATTCAGCCAACAG  0.50  37.4
 int1  rs266164282  19  3791605  TTTAGATAGTTGGT  0.29  28.6  TTTAGATAGTTGGG  0.36  31.5
@@ -204,7 +221,7 @@ int1  rs38604711   19  3792235  TGATTGCAGAAATT  0.29  28.6  TGATTGCAGAAATC  0.36
 int1  rs212603417  19  3792310  TTAAACCTCCCATT  0.36  31.5  TTAAACCTCCCATC  0.43  34.4
 int1  rs36316803   19  3792353  TATTGTCATGAGCA  0.36  31.5  TATTGTCATGAGCG  0.43  34.4
 int1  rs579758610  19  3792405  CATTACCCATGAGC  0.50  37.4  CATTACCCATGAGG  0.50  37.4
-\end{verbatim}
+\end{lstlisting}
 \normalsize
 The output columns are
 \begin{enumerate}
@@ -221,7 +238,7 @@ The output columns are
 \end{enumerate}
 \I To get the reverse primers in the upstream region, run
 \scriptsize
-\begin{verbatim}
+\begin{lstlisting}
 asp -r -g data/mus/genome                      \
 -s data/mus/vcf data/mus/exampleHotSpots19.txt | 
 head
@@ -235,7 +252,7 @@ int1  rs232338632  19  3800485  TTGCTCTATGAACC       0.43  34.4  TTGCTCTATGAACT 
 int1  rs261835571  19  3800506  TGGCTGTGGCTGTC       0.64  43.2  TGGCTGTGGCTGTT      0.57  40.3
 int1  rs222895727  19  3800511  TTATGTGGCTGTGG       0.50  37.4  TTATGTGGCTGTGT      0.43  34.4
 int1  rs579285301  19  3800535  TATTTATTTATTTTTGAGG  0.16  36.0  ATTTATTTATTTTTGAGA  0.11  32.1
-\end{verbatim}
+\end{lstlisting}
 \normalsize
 Notice that the two primers need not have the same length. By
 default, \ty{asp} searches for a primer of length 14--19 with a
@@ -243,9 +260,15 @@ GC-content as close to 0.5 as possible.
 \ei
 
 \subsection{\ty{xov}}
+\ty{xov} implements a maximum likelihood procedure for estimating the
+number of crossover events from the observed number of positive and
+negative allele-specific PCR reactions. In addition, it uses the
+likelihood ratio method for estimating a confidence interval. By
+default this interval is set to 95\%, but the user can set it to any
+level desired.
 \begin{itemize}
 \item Take a look at example input for \ty{xov}
-\begin{verbatim}
+\begin{lstlisting}
 cat data/mus/exampleResults.txt 
 # This mock data set is taken from
 #   Kauppi et al. (2009). Analysis of human
@@ -259,20 +282,20 @@ Int3   1    1      250  2000|3|3  600|1|7   200|0|8
 Int4   1    1      500  2000|5|3  600|0|8   200|0|8
 Int5   1    1     1500  2000|0|8  600|0|8   200|0|8
 Int6   1    1      500  60|5|7    120|11|1  240|12|0
-\end{verbatim}
-The tab-delimited columns list
+\end{lstlisting}
+The columns list
 \begin{enumerate}
 \item Interval
 \item Chromosome
 \item Start
 \item End
-\item number of molecules, number of positive PCR reactions, number of
+\item Number of molecules, number of positive PCR reactions, number of
   negative PCR reactions; this triplet of values is repeated for each
   experiment, three in this example
 \end{enumerate}
 \item Run \ty{xov}
 \small
-\begin{verbatim}
+\begin{lstlisting}
 xov data/mus/exampleResults.txt
 # Int  Chr  Start  End  Len  [%    %        %] [cM/Mb     cM/Mb    cM/Mb]
 Int1   1    1      500  500  0.004 0.015 0.039    7.448   30.004   78.119
@@ -281,21 +304,25 @@ Int3   1    1      250  250  0.008 0.027 0.063   33.291  107.923  253.801
 Int4   1    1      500  500  0.011 0.030 0.065   21.009   59.128  129.232
 Int5   1    1     1500 1500  0.000 0.000 0.009    0.000    0.000    5.716
 Int6   1    1      500  500  0.931 1.499 2.362 1862.604 2997.521 4723.249
-\end{verbatim}
+\end{lstlisting}
 \normalsize
 Two sets of confidence intervals are computed: one for the
 \%-recombination frequency, the other for the standard measure of
 recombination, centi-Morgans per megabase (cM/Mb). These are obtained
 from the \%-frequencies as
 \[
-\mbox{cM/Mb}=\frac{\mbox{\%-freq}}{\mbox{Len}}\times 10^6.
+\mbox{cM/Mb}=\frac{\mbox{\%-Freq}}{\mbox{Len}}\cdot 10^6.
 \]
 \end{itemize}
 
 \subsection{\ty{six}}
+\ty{six} simulates typing data given some crossover rate. This can be
+used for checking the accuracy of \ty{xov}, and for testing assay
+designs. 
+
 \begin{itemize}
 \item Run \ty{six}
-\begin{verbatim}
+\begin{lstlisting}
 six 
 # Int  Chr  Start       End         m|n-k|k m|n-k|k  m|n-k|k
 Int1  1     15,000,001  15,002,000  60|8|4  120|10|2 240|12|0
@@ -303,12 +330,12 @@ Int2  1     15,000,001  15,002,000  60|7|5  120|9|3  240|11|1
 Int3  1     15,000,001  15,002,000  60|8|4  120|7|5  240|12|0
 Int4  1     15,000,001  15,002,000  60|7|5  120|10|2 240|11|1
 Int5  1     15,000,001  15,002,000  60|5|7  120|8|4  240|9|3
-\end{verbatim}
+\end{lstlisting}
 where the columns have the same meaning as explained above for
-\textit{exampleResults.txt}.
+\texttt{exampleResults.txt}.
 \item Pipe the results of \ty{six} through \ty{xov}
 \small
-\begin{verbatim}
+\begin{lstlisting}
 six | xov 
 # Int  Chr  Start    End      Len  [%    %        %] [cM/Mb  cM/Mb     cM/Mb]
 Int1   1    15000001 15002000 2000 0.542 0.869 1.332 270.847 434.393  665.759
@@ -316,15 +343,15 @@ Int2   1    15000001 15002000 2000 0.895 1.404 2.142 447.448 701.838 1070.429
 Int3   1    15000001 15002000 2000 0.688 1.083 1.645 343.656 541.430  822.117
 Int4   1    15000001 15002000 2000 0.534 0.855 1.307 266.739 427.079  652.990
 Int5   1    15000001 15002000 2000 0.905 1.447 2.259 452.265 723.175 1129.031
-\end{verbatim}
+\end{lstlisting}
 \normalsize
 \item Check accuracy of \ty{xov}
-\begin{verbatim}
+\begin{lstlisting}
 six -r 1000 -x 1.5 | 
 ./src_xov/xov      | 
 awk '!/^#/{s+=$7;c++}END{print s/c}'
 1.59407
-\end{verbatim}
+\end{lstlisting}
 The simulated \%-crossover frequency (\ty{-x}) is 1.5, but the average
 estimate is 1.59. In other words, our estimator has an upward bias~\cite{ode15:hot}.
 \end{itemize}
