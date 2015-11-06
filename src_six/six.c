@@ -8,7 +8,7 @@
 #include "gsl_rng.h"
 #include "interface.h"
 #include "eprintf.h"
-#include "hotspot.h"
+#include "config.h"
 
 void runSim(Args *args, gsl_rng *r){
   int i, j, k, pos;

@@ -1,4 +1,4 @@
-AC_INIT([hotspot], [0.2.x])
+AC_INIT([hotspot], [0.3])
 AM_INIT_AUTOMAKE([-Wall foreign ])
 
 #AC_CONFIG_MACRO_DIR([m4])

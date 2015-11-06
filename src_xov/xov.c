@@ -17,7 +17,7 @@
 #include "interface.h"
 #include "eprintf.h"
 #include "ml.h"
-#include "hotspot.h"
+#include "config.h"
 
 /* intVal: return integer value of string */
 int intVal(char *str){

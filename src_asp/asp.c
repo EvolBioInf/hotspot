@@ -11,7 +11,7 @@
 #include "tab.h"
 #include "eprintf.h"
 #include "primers.h"
-#include "hotspot.h"
+#include "config.h"
 
 void scanFile(FILE *fp, Args *args);
 

@@ -11,7 +11,7 @@
 #include "eprintf.h"
 #include "oligos.h"
 #include "data.h"
-#include "hotspot.h"
+#include "config.h"
 
 void scanFile(FILE *fp, Args *args) {
   Sequence *seq = NULL;
