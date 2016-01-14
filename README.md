@@ -3,12 +3,14 @@ Linda Odenthal-Hesse, Julien Dutheil, Fabian Klötzl, Bernhard Haubold
 
 ## GETTING STARTED
 
-To build and install all programs execute the following steps. The first step is not required, if you download the latest release. Please note that `libdivsufsort` and `tabix` are required prerequisites.
+To build and install all programs execute the following steps. The first step is not required, if you download the latest release. Please note that `libdivsufsort`, `gsl` and `tabix` are required prerequisites.
 
     autoreconf -i
     ./configure
     make
     make install
+
+For extensive installation instructions see the [hotspotDoc.pdf](hotspotDoc.pdf).
 
 ## Usage
 
