@@ -1,6 +1,6 @@
 SUBDIRS= common src_xov src_aso src_asp src_six
 
-dist_noinst_DATA= hotspotDoc.pdf
+dist_noinst_DATA= COPYING README.md hotspotDoc.pdf
 
 # Helpers for downloading data
 .PHONY: get-all-data-mus get-chr19-data-mus data_dirs
