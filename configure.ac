@@ -29,9 +29,13 @@ AS_IF([test x"$TABIX_CHECK" != x"yes"],
     [AC_MSG_ERROR([Please install tabix.])
 ])
 
-AC_CHECK_LIB([gslcblas],[cblas_dgemm])
-AC_CHECK_LIB([gsl],[gsl_blas_dgemm])
+AC_CHECK_LIB([m],[cos])
+AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], [have_gsl=no])
+AC_CHECK_LIB([gsl],[gsl_ran_binomial], [], [have_gsl=no])
 
+AS_IF([test "x$have_gsl" = "xno"],[
+	AC_MSG_ERROR([Missing the Gnu Scientific Library.])
+])
 
 # Check for various headers including those used by libdivsufsort.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h unistd.h stdint.h inttypes.h err.h errno.h fcntl.h])
