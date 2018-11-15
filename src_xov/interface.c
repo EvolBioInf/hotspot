@@ -14,7 +14,7 @@ Args *args;
 
 Args *getArgs(int argc, char *argv[]){
   char c;
-  char *optString = "hvpdoc:m:M:i:";
+  char *optString = "hvpdoc:m:M:i:D:";
 
   args = (Args *)emalloc(sizeof(Args));
   args->c = DEFAULT_C;
@@ -23,6 +23,7 @@ Args *getArgs(int argc, char *argv[]){
   args->i = DEFAULT_I;
   args->o = 0;
   args->d = 0;
+  args->D = DEFAULT_D;
   args->p = 0;
   args->h = 0;
   args->v = 0;
@@ -39,6 +40,9 @@ Args *getArgs(int argc, char *argv[]){
       break;
     case 'M': /* maximum x-value for log-likelihood curve */
       args->M = atof(optarg);
+      break;
+    case 'D':
+      args->D = estrdup(optarg);
       break;
     case 'p': /* print log-likelihood curve? */
       args->p = 1;
@@ -78,11 +82,12 @@ void printUsage(){
   printf("Example: xov foo.dat\n");
   printf("Options:\n");
   printf("\t[-c <NUM> confidence interval; default: %.2f]\n",DEFAULT_C);
-  printf("\t[-p print log-likelihood curve; default: print ML-estimates]\n");
   printf("\t[-m <NUM> minimum x-value for log-likelihood curve; default %.3f]\n",DEFAULT_M);
   printf("\t[-M <NUM> maximum x-value for log-likelihood curve; default: %.3f]\n",DEFAULT_MM);
   printf("\t[-i <NUM> number of intervals for log-likelihood curve; default: %d]\n",DEFAULT_I);
+  printf("\t[-D <CHAR> column delimiter; default: TAB]\n");
   printf("\t[-o use Poisson approximation; default: use exact likelihood function]\n");
+  printf("\t[-p print log-likelihood curve; default: print ML-estimates]\n");
   printf("\t[-d print data and exit (debug)]\n");
   printf("\t[-h print this help message and exit]\n");
   printf("\t[-v print program information and exit]\n");

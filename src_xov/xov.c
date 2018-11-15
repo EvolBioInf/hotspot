@@ -14,6 +14,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <gsl/gsl_cdf.h>
+#include "tab.h"
 #include "interface.h"
 #include "eprintf.h"
 #include "ml.h"
@@ -31,39 +32,43 @@ int intVal(char *str){
     if(isdigit(str[i]))
       num[j++] = str[i];
   num[j] = '\0';
-  
+  i = atoi(num);
   free(num);
-  return atoi(num);
+
+  return i;
 }
 
 void scanFile(Args *args, FILE *fp){
   char *line, *name, *token, *chr;
-  size_t n;
-  int status, len, l, start, end;
+  int len, l, start, end;
   int pos[2], p, i, tp, tn;
   Data *data;
   double ll, ul, cf;
 
-  line = NULL;
-  while((status = getline(&line,&n,fp)) != -1){
-    if(line[0] != '#')
-      break;
-  }
   if(!args->p)
     printf("# Int\tChr\tStart\tEnd\tLen\t[%%\t%%\t%%]\t[cM/Mb\tcM/Mb\tcM/Mb]\n");
   data = newData(1,args->o);
-  while(status != -1){
+  tabSetFieldSep(args->D);
+  while((line = tabGetLine(fp)) != NULL){
+    if(line[0] == '#' || strlen(line) == 0)
+      continue;
+    if(tabNfield() < 5) {
+      fprintf(stderr, "ERROR[xov]: There is a problem scanning the columns in your input file.\n");
+      fprintf(stderr, "ERROR[xov]: Please check the file formatting and consider adjusting the delimiter using -D.\n");
+      exit(-1);
+    }
     data->n = 0;
-    name = estrdup(strtok(line,"\t")); /* read name of region */
-    chr = estrdup(strtok(NULL,"\t"));  /* read chromosome */
-    start = intVal(strtok(NULL,"\t")); /* start position */
-    end = intVal(strtok(NULL,"\t"));   /* end position */
-    len = end - start + 1;             /* length of region in bp */
+    name = estrdup(tabField(0)); /* read name of region */
+    chr = estrdup(tabField(1));  /* read chromosome */
+    start = intVal(tabField(2)); /* start position */
+    end = intVal(tabField(3));   /* end position */
+    len = end - start + 1;          /* length of region in bp */
     tp = 0; /* total positives */
     tn = 0; /* total negatives */
-    while((token = strtok(NULL,"\t")) != NULL){ /* iterating across experiments */
+    for(i = 4; i < tabNfield(); i++) {
       if(data->n + 1 == data->maxN)
 	expandData(data);
+      token = tabField(i);
       l = strlen(token);
       p = 0;
       for(i=0;i<l;i++){  /* determine positions of commata */
@@ -109,7 +114,6 @@ void scanFile(Args *args, FILE *fp){
       printf("\t%.3f\t%.3f\t%.3f\n",ll,cf,ul);
     }else
       printf("%s\t%d\t%d\t%*d\tNA\tNA\tNA\tNA\tNA\tNA\n",name,start,end,4,len);
-    status = getline(&line,&n,fp);
     free(name);
   } 
   free(line);
