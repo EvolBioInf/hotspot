@@ -41,7 +41,7 @@ int intVal(char *str){
 void scanFile(Args *args, FILE *fp){
   char *line, *name, *token, *chr;
   int len, l, start, end;
-  int pos[2], p, i, tp, tn;
+  int pos[2], p, i, j, tp, tn;
   Data *data;
   double ll, ul, cf;
 
@@ -71,10 +71,10 @@ void scanFile(Args *args, FILE *fp){
       token = tabField(i);
       l = strlen(token);
       p = 0;
-      for(i=0;i<l;i++){  /* determine positions of commata */
-	if(token[i] == '|'){
-	  token[i] = '\0';
-	  pos[p++] = i+1;
+      for(j=0;j<l;j++){  /* determine positions of commata */
+	if(token[j] == '|'){
+	  token[j] = '\0';
+	  pos[p++] = j+1;
 	}
       }
       data->numMol[data->n] = atoi(token); /* number of molecules */
