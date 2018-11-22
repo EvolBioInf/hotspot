@@ -77,10 +77,10 @@ void printUsage(){
   printf("Purpose: Simulate crossover data for analysis with xov\n");
   printf("Example: six\n");
   printf("Options:\n");
-  printf("\t[-r <NUM> number of replicates; default: %d\n",DEFAULT_R);
+  printf("\t[-r <NUM> number of replicates; default: %d]\n",DEFAULT_R);
   printf("\t[-m <NUM> number of experiments per replicate, followed by number of molecules per exp.; default: %d %d %d %d]\n", DEFAULT_M,DEFAULT_MM0,DEFAULT_MM1,DEFAULT_MM2);
   printf("\t[-n <NUM> number of replicates per experiment; default: %d]\n",DEFAULT_N);
-  printf("\t[-x <NUM> crossover rate in cM; default: %.1f\n",DEFAULT_X);
+  printf("\t[-x <NUM> crossover rate in cM; default: %.1f]\n",DEFAULT_X);
   printf("\t[-s <NUM> seed for random number generator; default: generated internally]\n");
   printf("\t[-h print this help message and exit]\n");
   printf("\t[-v print program information and exit]\n");
