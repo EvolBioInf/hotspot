@@ -1,4 +1,4 @@
-/***** hotPrimers.c *******************************
+/***** asp.c **************************************
  * Description:
  * Author: Bernhard Haubold, haubold@evolbio.mpg.de
  * Date: Sun Jun  7 21:51:05 2015

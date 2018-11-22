@@ -1,4 +1,4 @@
-/***** hotOligos.c ********************************
+/***** aso.c **************************************
  * Description:
  * Author: Bernhard Haubold, haubold@evolbio.mpg.de
  * Date: Sun Jun  7 16:35:35 2015
