@@ -15,7 +15,7 @@
 \newcommand{\I}{\item}
 \newcommand{\ty}{\texttt}
 \newcommand{\kr}{K_{\rm r}}
-\newcommand{\version}{1.0}
+\newcommand{\version}{1.1}
 \textwidth=16cm
 \textheight=23cm
 \begin{document}
@@ -25,7 +25,7 @@ Investigating Recombination Hotspots}
 \maketitle
 \section{Introduction}
 \ty{hotspot} is a software package for detecting and analyzing
-recombination hotspots \cite{ode15:hot}. This is done in three steps:
+recombination hotspots \cite{ode16:hot}. This is done in three steps:
 Preparation of allele-specific PCR, the actual PCR, and analysis of
 the PCR products. \ty{hotspot} contains the two programs \ty{asp} and \ty{aso} for designing
 allele-specific primers and oligos used in the pre-PCR phase. In
@@ -97,13 +97,17 @@ example hotspot coordinates supplied with the program
 \begin{lstlisting}
 $ cat data/mus/exampleHotSpots19.txt 
 # NB: These mouse hotspot data by Smagulova et al. (2011) are provided 
-#   as part of the aspro software package for designing
-#   Allele-Specific PRimers and Oligos. The hotspot coordinates by
-#   Smagulova et al. refer to mm9 and will therefore not match the
-#   current mouse assembly.
-# Rerefence: Smagulova et al. (2011). Genome-wide
-#   analysis reveals novel molecular features of mouse recombination
-#   hotspots. Nature, 472:375-378.
+#   as part of the hotspot software package for designing
+#   allele-specific primers and oligos (Odenthal-Hesse et al., 2016). 
+#   The hotspot coordinates by Smagulova et al. refer to mm9 and 
+#   will therefore not match the current mouse assembly.
+# References: 
+#   1) Smagulova et al. (2011). Genome-wide analysis reveals novel
+#   molecular features of mouse recombination hotspots. Nature, 
+#   472:375-378.
+#   2) Odenthal-Hesse et al. (2016). hotspot: software to support
+#   sperm-typing for investigating recombination hotspots. 
+#   Bioinformatics, 2016, 1-2; doi: 10.1093/bioinformatics/btw195.
 # int   chr	start	end
 int1	chr19	3796569	3799969
 int2	chr19	3804782	3808182
@@ -348,12 +352,12 @@ Int5   1    15000001 15002000 2000 0.905 1.447 2.259 452.265 723.175 1129.031
 \item Check accuracy of \ty{xov}
 \begin{lstlisting}
 six -r 1000 -x 1.5 | 
-./src_xov/xov      | 
+xov                | 
 awk '!/^#/{s+=$7;c++}END{print s/c}'
 1.59407
 \end{lstlisting}
 The simulated \%-crossover frequency (\ty{-x}) is 1.5, but the average
-estimate is 1.59. In other words, our estimator has an upward bias~\cite{ode15:hot}.
+estimate is 1.59. In other words, our estimator has an upward bias~\cite{ode16:hot}.
 \end{itemize}
 
 %%\bibliography{/home/haubold/References/references}
